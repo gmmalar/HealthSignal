@@ -12,6 +12,8 @@ export interface HealthSignalResponse {
   stateLabel: string;
   status: "Verified" | "Unavailable" | "Error";
   freshness: string;
+  source: string;
+  lastUpdated: string;
   rawData: JsonValue;
   normalizedData: JsonValue;
 }

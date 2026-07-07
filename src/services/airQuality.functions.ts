@@ -11,6 +11,8 @@ export type AirQualityResult =
         state: string;
         status: "Verified" | "Unavailable";
         freshness: string;
+        source: string;
+        lastUpdated: string;
         rawData: JsonValue;
       };
     }
@@ -18,6 +20,9 @@ export type AirQualityResult =
 
 const STATE_ZIP: Record<string, string> = {
   texas: "75201",
+  "north-carolina": "27607",
+  florida: "32801",
+  arizona: "86001",
 };
 
 export const getAirQuality = createServerFn({ method: "GET" })
@@ -56,6 +61,8 @@ export const getAirQuality = createServerFn({ method: "GET" })
             state: data.state,
             status: "Unavailable",
             freshness: "",
+            source: "EPA AirNow",
+            lastUpdated: "",
             rawData: [],
           },
         };
@@ -76,6 +83,8 @@ export const getAirQuality = createServerFn({ method: "GET" })
           state: data.state,
           status: "Verified",
           freshness,
+          source: "EPA AirNow",
+          lastUpdated: freshness,
           rawData: raw,
         },
       };

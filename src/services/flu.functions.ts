@@ -13,28 +13,42 @@ export type FluResult =
         stateLabel: string;
         status: "Verified" | "Unavailable";
         freshness: string;
+        source: string;
+        lastUpdated: string;
         rawData: JsonValue;
         normalizedData: Record<string, never>;
       };
     }
   | { status: "error"; error: string };
 
-const STATE_REGION: Record<string, { region: string; label: string }> = {
-  texas: { region: "tx", label: "Texas" },
-  california: { region: "ca", label: "California" },
-  florida: { region: "fl", label: "Florida" },
+const STATE_REGION: Record<string, string> = {
+  texas: "tx",
+  california: "ca",
+  florida: "fl",
+  arizona: "az",
+  "north-carolina": "nc",
+  illinois: "il",
+  washington: "wa",
 };
+
+function toLabel(stateKey: string): string {
+  return stateKey
+    .split("-")
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(" ");
+}
 
 export const getFlu = createServerFn({ method: "GET" })
   .inputValidator((data: { state: string }) => data)
   .handler(async ({ data }): Promise<FluResult> => {
-    const entry = STATE_REGION[data.state];
-    if (!entry) {
+    const region = STATE_REGION[data.state];
+    if (!region) {
       return { status: "error", error: "Unsupported state for Flu" };
     }
+    const label = toLabel(data.state);
 
     const url = new URL("https://api.delphi.cmu.edu/epidata/fluview/");
-    url.searchParams.set("regions", entry.region);
+    url.searchParams.set("regions", region);
     url.searchParams.set("epiweeks", "202620-202627");
 
     try {
@@ -49,13 +63,15 @@ export const getFlu = createServerFn({ method: "GET" })
           status: "unavailable",
           topic: "Flu",
           state: data.state,
-          stateLabel: entry.label,
+          stateLabel: label,
           normalizedData: {
             topic: "Flu",
             state: data.state,
-            stateLabel: entry.label,
+            stateLabel: label,
             status: "Unavailable",
             freshness: "",
+            source: "Delphi Epidata (Carnegie Mellon)",
+            lastUpdated: "",
             rawData: (raw as unknown) as JsonValue,
             normalizedData: {},
           },
@@ -73,13 +89,15 @@ export const getFlu = createServerFn({ method: "GET" })
         status: "success",
         topic: "Flu",
         state: data.state,
-        stateLabel: entry.label,
+        stateLabel: label,
         normalizedData: {
           topic: "Flu",
           state: data.state,
-          stateLabel: entry.label,
+          stateLabel: label,
           status: "Verified",
           freshness,
+          source: "Delphi Epidata (Carnegie Mellon)",
+          lastUpdated: freshness,
           rawData: (raw as unknown) as JsonValue,
           normalizedData: {},
         },
