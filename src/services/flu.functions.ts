@@ -99,6 +99,10 @@ export const getFlu = createServerFn({ method: "GET" })
           topic: "Flu",
           state: data.state,
           stateLabel: label,
+          freshness: "",
+          lastUpdated: "",
+          source: "Delphi Epidata (Carnegie Mellon)",
+          rawData: raw as JsonValue,
           normalizedData: {
             condition: "Influenza-like Illness (ILI)",
             reportingPeriod: "",
