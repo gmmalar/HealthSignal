@@ -90,7 +90,7 @@ function EmptyState() {
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <ClipboardList className="h-12 w-12 text-muted-foreground/50" />
       <p className="mt-4 text-sm text-muted-foreground">
-        Choose a state and health topic to generate a public health briefing.
+        Select a state and health topic, then click Generate Briefing to receive the latest verified public health summary.
       </p>
     </div>
   );
