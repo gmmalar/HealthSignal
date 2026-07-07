@@ -13,9 +13,15 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "HealthSignal — Public Health Intelligence" },
-      { name: "description", content: "Simple, trustworthy public health briefings using verified public health data." },
+      {
+        name: "description",
+        content: "Simple, trustworthy public health briefings using verified public health data.",
+      },
       { property: "og:title", content: "HealthSignal — Public Health Intelligence" },
-      { property: "og:description", content: "Simple, trustworthy public health briefings using verified public health data." },
+      {
+        property: "og:description",
+        content: "Simple, trustworthy public health briefings using verified public health data.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -45,7 +51,7 @@ function Index() {
     setBriefingMessage(undefined);
 
     // Live source: Texas + Air Quality via AirNow. Everything else stays mock.
-    if (selectedState === "Texas" && selectedTopic === "Air Quality") {
+    if (selectedState === "texas" && selectedTopic === "air-quality") {
       try {
         const result = await getAirQuality({ data: { state: selectedState } });
         if (result.status === "success") {
@@ -68,7 +74,19 @@ function Index() {
       return;
     }
 
-      return (
+    setTimeout(() => {
+      setBriefingData({
+        state: selectedState,
+        topic: selectedTopic,
+        status: "Verified",
+        freshness: "Mock Freshness",
+        summary: `Mock briefing for ${selectedTopic} in ${selectedState}.`,
+      });
+      setBriefingStatus("success");
+    }, 2000);
+  };
+
+  return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
@@ -82,10 +100,7 @@ function Index() {
             </div>
             <GenerateButton onClick={handleGenerate} isLoading={isLoading} />
             {validationError && (
-              <p
-                role="alert"
-                className="text-sm font-medium text-destructive"
-              >
+              <p role="alert" className="text-sm font-medium text-destructive">
                 {validationError}
               </p>
             )}

@@ -1,12 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [k: string]: JsonValue };
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
 
 export type AirQualityResult =
   | {
@@ -24,7 +18,7 @@ export type AirQualityResult =
   | { status: "error"; error: string };
 
 const STATE_ZIP: Record<string, string> = {
-  Texas: "75201",
+  texas: "75201",
 };
 
 export const getAirQuality = createServerFn({ method: "GET" })
@@ -69,14 +63,10 @@ export const getAirQuality = createServerFn({ method: "GET" })
       }
 
       const first = raw[0] as Record<string, JsonValue>;
-      const dateObserved =
-        typeof first.DateObserved === "string" ? first.DateObserved.trim() : "";
-      const hourObserved =
-        typeof first.HourObserved === "number" ? first.HourObserved : "";
+      const dateObserved = typeof first.DateObserved === "string" ? first.DateObserved.trim() : "";
+      const hourObserved = typeof first.HourObserved === "number" ? first.HourObserved : "";
       const localTz = typeof first.LocalTimeZone === "string" ? first.LocalTimeZone : "";
-      const freshness = dateObserved
-        ? `${dateObserved} ${hourObserved}:00 ${localTz}`.trim()
-        : "";
+      const freshness = dateObserved ? `${dateObserved} ${hourObserved}:00 ${localTz}`.trim() : "";
 
       return {
         status: "success",
