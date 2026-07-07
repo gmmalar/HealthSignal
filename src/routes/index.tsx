@@ -7,6 +7,7 @@ import { TopicSelector } from "@/components/TopicSelector";
 import { GenerateButton } from "@/components/GenerateButton";
 import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
+import { getAirQuality } from "@/services/airQuality.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,10 +29,11 @@ function Index() {
   const [briefingStatus, setBriefingStatus] = useState<BriefingStatus>("empty");
   const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [briefingMessage, setBriefingMessage] = useState<string | undefined>(undefined);
 
   const isLoading = briefingStatus === "loading";
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (isLoading) return;
     if (!selectedState || !selectedTopic) {
       setValidationError("Please select both a state and a health topic");
@@ -40,6 +42,31 @@ function Index() {
     setValidationError(null);
     setBriefingStatus("loading");
     setBriefingData(null);
+    setBriefingMessage(undefined);
+
+    // Live source: Texas + Air Quality via AirNow. Everything else stays mock.
+    if (selectedState === "Texas" && selectedTopic === "Air Quality") {
+      try {
+        const result = await getAirQuality({ data: { state: selectedState } });
+        if (result.status === "success") {
+          setBriefingData(result.normalizedData as Record<string, unknown>);
+          setBriefingStatus("success");
+        } else if (result.status === "unavailable") {
+          setBriefingData(null);
+          setBriefingMessage("No current monitoring data available for this reporting area.");
+          setBriefingStatus("unavailable");
+        } else {
+          setBriefingData(null);
+          setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
+          setBriefingStatus("error");
+        }
+      } catch {
+        setBriefingData(null);
+        setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
+        setBriefingStatus("error");
+      }
+      return;
+    }
 
     setTimeout(() => {
       setBriefingData({
@@ -77,7 +104,7 @@ function Index() {
           </div>
 
           {/* Hero Card */}
-          <HeroCard status={briefingStatus} data={briefingData} />
+          <HeroCard status={briefingStatus} data={briefingData} message={briefingMessage} />
         </div>
       </main>
 
