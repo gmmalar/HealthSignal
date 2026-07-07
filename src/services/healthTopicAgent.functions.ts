@@ -60,7 +60,7 @@ async function callClaude(prompt: string): Promise<string> {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-sonnet-5",
         max_tokens: 400,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -101,9 +101,11 @@ export const interpretHealthTopic = createServerFn({ method: "POST" })
     const prompt = `${builder(nd, resolvedLabel)}\n\n${GUARDRAIL}`;
 
     try {
+      console.log("Health Topic Agent input:", { topic, stateLabel, normalizedData });
       const summary = await callClaude(prompt);
       return { summary, generatedBy: "Claude Sonnet" };
-    } catch {
-      return ERROR_RESULT;
+    } catch (error) {
+      console.error("Health Topic Agent error:", error);
+      return { summary: "Health summary is temporarily unavailable.", generatedBy: "Claude Sonnet" };
     }
   });
