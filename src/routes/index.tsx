@@ -68,19 +68,7 @@ function Index() {
       return;
     }
 
-    setTimeout(() => {
-      setBriefingData({
-        state: selectedState,
-        topic: selectedTopic,
-        status: "Verified",
-        freshness: "Mock Freshness",
-        summary: `Mock briefing for ${selectedTopic} in ${selectedState}.`,
-      });
-      setBriefingStatus("success");
-    }, 2000);
-  };
-
-  return (
+      return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
