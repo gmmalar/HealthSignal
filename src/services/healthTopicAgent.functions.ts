@@ -6,15 +6,29 @@ export interface HealthTopicInterpretation {
   generatedBy: "Claude Sonnet";
 }
 
-type PromptBuilder = (data: Record<string, unknown>) => string;
+type PromptBuilder = (data: Record<string, unknown>, stateLabel: string) => string;
 
 const HEALTH_TOPIC_PROMPTS: Record<string, PromptBuilder> = {
-  "air-quality": (data) =>
-    `Air quality is ${data.category} in ${data.stateLabel || "this location"} today, with an AQI of ${data.aqi}. ${data.parameter} is the dominant pollutant. Translate this into 2-3 plain-language sentences a non-expert could understand in seconds. If AQI is Moderate or worse, mention that sensitive groups (children, elderly, those with respiratory conditions) may want to limit prolonged outdoor activity. No medical jargon.`,
-  flu: (data) =>
-    `Flu-like illness activity currently shows an activity level of ${data.activityLevel}% for ${data.reportingPeriod}. Translate this into 2-3 plain-language sentences. If this is a low value (under 2%), note that it's currently outside peak flu season rather than implying something is wrong. No medical jargon.`,
-  "disease-outbreaks": (data) =>
-    `${data.condition} has had ${data.reportedCases} reported cases for ${data.reportingPeriod}, based on CDC NNDSS surveillance. If reportedCases is 0, explain this as a positive result — no cases reported — rather than a data gap. If reportedCases is greater than 0, state the number factually without implying alarm or downplaying it. Do not reference vaccination policy or any politically charged framing — report case counts and context only. No medical jargon.`,
+  "air-quality": (data, stateLabel) =>
+    `Air quality is ${data.category} in ${stateLabel || data.stateLabel || "this location"} today, with an AQI of ${data.aqi}. ${data.parameter} is the dominant pollutant. Translate this into 2-3 plain-language sentences a non-expert could understand in seconds. If AQI is Moderate or worse, mention that sensitive groups (children, elderly, those with respiratory conditions) may want to limit prolonged outdoor activity. No medical jargon.`,
+  flu: (data, stateLabel) =>
+    `${stateLabel} currently shows flu-like illness activity of ${data.activityLevel}% for ${data.reportingPeriod}. Translate this into 2-3 plain-language sentences, beginning by naming ${stateLabel}. If this is a low value (under 2%), note that it's currently outside peak flu season rather than implying something is wrong. No medical jargon.`,
+  "disease-outbreaks": (data, stateLabel) =>
+    `You are writing a public health briefing for one selected U.S. state.
+
+The state is: ${stateLabel}
+
+Never describe the reportedCases value as a national total. Always describe it as the surveillance count for the selected state. Begin the summary by naming the selected state.
+
+Example: "Texas has reported 46 measles cases during CDC reporting Week 25."
+
+Do not write "in the United States." Do not imply this is a nationwide count. Mention that the data comes from CDC national surveillance only as the reporting source, not as the geographic scope of the case count.
+
+Condition: ${data.condition}
+Reported cases: ${data.reportedCases}
+Reporting period: ${data.reportingPeriod}
+
+Translate this into 2-3 plain-language sentences. If reportedCases is 0, frame this as a positive result. Do not reference vaccination policy or politically charged framing. No medical jargon. Do not invent facts, estimate values, infer trends not present in the supplied data, or provide medical advice.`,
 };
 
 const GUARDRAIL =
@@ -71,10 +85,10 @@ async function callClaude(prompt: string): Promise<string> {
 
 export const interpretHealthTopic = createServerFn({ method: "POST" })
   .inputValidator(
-    (input: { topic: string; normalizedData: JsonValue }) => input,
+    (input: { topic: string; stateLabel?: string; normalizedData: JsonValue }) => input,
   )
   .handler(async ({ data }): Promise<HealthTopicInterpretation> => {
-    const { topic, normalizedData } = data;
+    const { topic, stateLabel, normalizedData } = data;
     const nd = (normalizedData ?? {}) as Record<string, unknown>;
 
     if (nd.dataStatus === "Unavailable") return UNAVAILABLE_RESULT;
@@ -82,7 +96,9 @@ export const interpretHealthTopic = createServerFn({ method: "POST" })
     const builder = HEALTH_TOPIC_PROMPTS[topic];
     if (!builder) return ERROR_RESULT;
 
-    const prompt = `${builder(nd)}\n\n${GUARDRAIL}`;
+    const resolvedLabel =
+      stateLabel || (nd.stateLabel as string | undefined) || "this location";
+    const prompt = `${builder(nd, resolvedLabel)}\n\n${GUARDRAIL}`;
 
     try {
       const summary = await callClaude(prompt);
