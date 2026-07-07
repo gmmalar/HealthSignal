@@ -12,7 +12,6 @@ type AdapterFn = (args: { data: { state: string } }) => Promise<unknown>;
 
 interface TopicConfig {
   fn: AdapterFn;
-  liveStates: string[];
   unavailableMessage: string;
   errorMessage: string;
 }
@@ -20,20 +19,17 @@ interface TopicConfig {
 const TOPIC_HANDLERS: Record<string, TopicConfig> = {
   "air-quality": {
     fn: getAirQuality as unknown as AdapterFn,
-    liveStates: ["texas"],
     unavailableMessage: "No current monitoring data available for this reporting area.",
     errorMessage: "Unable to retrieve live Air Quality data. Please try again.",
   },
   flu: {
     fn: getFlu as unknown as AdapterFn,
-    liveStates: ["texas", "california", "florida"],
     unavailableMessage:
       "No surveillance data reported for this state during the selected reporting period.",
     errorMessage: "Unable to retrieve live Flu data. Please try again.",
   },
   "disease-outbreaks": {
     fn: getDiseaseOutbreaks as unknown as AdapterFn,
-    liveStates: ["texas", "california", "florida"],
     unavailableMessage:
       "No verified surveillance data available for this state and reporting period.",
     errorMessage: "Unable to retrieve live Disease Outbreak data. Please try again.",
@@ -86,9 +82,9 @@ export async function getHealthBriefing({
 }): Promise<BriefingOutcome> {
   const handler = TOPIC_HANDLERS[topic];
 
-  // Fallback to mock data when the topic has no adapter or the state is
-  // not yet wired to a live source.
-  if (!handler || !handler.liveStates.includes(state)) {
+  // Fallback to mock data only when the topic has no adapter at all.
+  // State coverage is owned by each adapter, not the manager.
+  if (!handler) {
     await new Promise((r) => setTimeout(r, 2000));
     return { status: "Verified", data: mockBriefing(state, topic) };
   }
