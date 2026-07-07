@@ -10,7 +10,7 @@ export type AirQualityResult =
         state: string;
         status: "Verified" | "Unavailable";
         freshness: string;
-        rawData: unknown;
+        rawData: Array<Record<string, unknown>>;
       };
     }
   | { status: "error"; error: string };
