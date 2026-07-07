@@ -2,6 +2,7 @@ import { getAirQuality } from "./airQuality.functions";
 import { getFlu } from "./flu.functions";
 import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
 import { interpretHealthTopic } from "./healthTopicAgent.functions";
+import { classifyFreshness } from "./freshnessAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
@@ -96,6 +97,12 @@ export async function getHealthBriefing({
 
     if (statusRaw === "success" || statusRaw === "verified") {
       const data = normalizeAdapterResult(raw, topic, state);
+      // Freshness Agent (deterministic) runs before downstream specialist agents.
+      data.freshnessInfo = classifyFreshness({
+        topic: data.topic,
+        freshness: data.freshness,
+        lastUpdated: data.lastUpdated,
+      });
       // Specialist agents (sequential). Currently: Health Topic Agent.
       // [FUTURE] Freshness Agent → Trend Agent → (Health Topic Agent) → Alert Agent → Recommendation Agent
       try {
