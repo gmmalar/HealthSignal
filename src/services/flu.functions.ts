@@ -8,15 +8,11 @@ export type FluResult =
       state: string;
       stateLabel: string;
       normalizedData: {
-        topic: "Flu";
-        state: string;
-        stateLabel: string;
-        status: "Verified" | "Unavailable";
-        freshness: string;
-        source: string;
-        lastUpdated: string;
-        rawData: JsonValue;
-        normalizedData: Record<string, never>;
+        condition: "Influenza-like Illness (ILI)";
+        reportingPeriod: string;
+        activityLevel: number;
+        dataStatus: "Verified" | "Unavailable";
+        source: "Delphi Epidata (Carnegie Mellon)";
       };
     }
   | { status: "error"; error: string };
@@ -36,6 +32,41 @@ function toLabel(stateKey: string): string {
     .split("-")
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join(" ");
+}
+
+function formatWeekEnding(value: JsonValue): string {
+  const raw = String(value ?? "");
+  if (!raw) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return `Week ending ${raw}`;
+  }
+  if (/^\d{8}$/.test(raw)) {
+    const year = raw.slice(0, 4);
+    const month = raw.slice(4, 6);
+    const day = raw.slice(6, 8);
+    return `Week ending ${year}-${month}-${day}`;
+  }
+  return "";
+}
+
+function toActivityLevel(value: JsonValue): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = parseFloat(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+}
+
+function getMostRecentRow(
+  rows: Array<Record<string, JsonValue>>,
+): Record<string, JsonValue> | undefined {
+  return rows.reduce<Record<string, JsonValue> | undefined>((latest, row) => {
+    if (!latest) return row;
+    const ew = String(row.epiweek ?? "0");
+    const latestEw = String(latest.epiweek ?? "0");
+    return ew > latestEw ? row : latest;
+  }, undefined);
 }
 
 export const getFlu = createServerFn({ method: "GET" })
@@ -65,15 +96,11 @@ export const getFlu = createServerFn({ method: "GET" })
           state: data.state,
           stateLabel: label,
           normalizedData: {
-            topic: "Flu",
-            state: data.state,
-            stateLabel: label,
-            status: "Unavailable",
-            freshness: "",
+            condition: "Influenza-like Illness (ILI)",
+            reportingPeriod: "",
+            activityLevel: 0,
+            dataStatus: "Unavailable",
             source: "Delphi Epidata (Carnegie Mellon)",
-            lastUpdated: "",
-            rawData: (raw as unknown) as JsonValue,
-            normalizedData: {},
           },
         };
       }
@@ -85,21 +112,23 @@ export const getFlu = createServerFn({ method: "GET" })
         if (typeof rd === "string" && rd > freshness) freshness = rd;
       }
 
+      const mostRecent = getMostRecentRow(rows);
+      const reportingPeriod = mostRecent
+        ? formatWeekEnding(mostRecent.release_date)
+        : "";
+      const activityLevel = mostRecent ? toActivityLevel(mostRecent.wili) : 0;
+
       return {
         status: "success",
         topic: "Flu",
         state: data.state,
         stateLabel: label,
         normalizedData: {
-          topic: "Flu",
-          state: data.state,
-          stateLabel: label,
-          status: "Verified",
-          freshness,
+          condition: "Influenza-like Illness (ILI)",
+          reportingPeriod,
+          activityLevel,
+          dataStatus: "Verified",
           source: "Delphi Epidata (Carnegie Mellon)",
-          lastUpdated: freshness,
-          rawData: (raw as unknown) as JsonValue,
-          normalizedData: {},
         },
       };
     } catch (err) {
