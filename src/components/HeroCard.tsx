@@ -118,32 +118,43 @@ function DataState({ data }: { data: Record<string, unknown> }) {
 
   const summary = typeof data.summary === "string" ? data.summary : null;
   const generatedBy = typeof data.generatedBy === "string" ? data.generatedBy : null;
-  const freshness = typeof data.freshness === "string" ? data.freshness : null;
-  const lastUpdated = typeof data.lastUpdated === "string" ? data.lastUpdated : null;
-  const latestUpdate = freshness || lastUpdated || "—";
+  const freshnessInfo =
+    (data.freshnessInfo as
+      | {
+          status: "Verified" | "Recent" | "Stale" | "Unavailable";
+          badge: string;
+        }
+      | undefined) ?? undefined;
+  const freshnessStatus = freshnessInfo?.status ?? "Verified";
+  const freshnessBadge =
+    freshnessInfo?.badge ??
+    (typeof data.freshness === "string" && data.freshness
+      ? data.freshness
+      : typeof data.lastUpdated === "string" && data.lastUpdated
+        ? data.lastUpdated
+        : "—");
 
-  const statusValue = typeof data.status === "string" ? data.status : "Verified";
-  const isVerified = statusValue === "Verified";
+  const dotClass =
+    freshnessStatus === "Verified"
+      ? "bg-emerald-500"
+      : freshnessStatus === "Recent"
+        ? "bg-amber-500"
+        : freshnessStatus === "Stale"
+          ? "bg-red-500"
+          : "bg-muted-foreground";
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2">
         <span
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            isVerified
-              ? "bg-primary/10 text-primary"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {isVerified ? "Verified" : statusValue}
+          className={`inline-block h-2.5 w-2.5 rounded-full ${dotClass}`}
+          aria-hidden="true"
+        />
+        <span className="text-sm font-medium text-foreground">
+          {freshnessStatus}
         </span>
-      </div>
-
-      <div className="space-y-1">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Latest Update
-        </p>
-        <p className="text-sm text-foreground">{latestUpdate}</p>
+        <span className="text-sm text-muted-foreground">·</span>
+        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
       </div>
 
       {summary && (
