@@ -1,9 +1,17 @@
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [k: string]: JsonValue };
+
 export interface HealthSignalResponse {
   topic: string;
   state: string;
   stateLabel: string;
   status: "Verified" | "Unavailable" | "Error";
   freshness: string;
-  rawData: unknown;
-  normalizedData: unknown;
+  rawData: JsonValue;
+  normalizedData: JsonValue;
 }
