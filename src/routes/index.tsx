@@ -9,6 +9,7 @@ import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
 import { getAirQuality } from "@/services/airQuality.functions";
 import { getFlu } from "@/services/flu.functions";
+import { getDiseaseOutbreaks } from "@/services/diseaseOutbreaks.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -97,6 +98,33 @@ function Index() {
       } catch {
         setBriefingData(null);
         setBriefingMessage("Unable to retrieve live Flu data. Please try again.");
+        setBriefingStatus("error");
+      }
+      return;
+    }
+
+    // Live source: Disease Outbreaks (Measles) via CDC NNDSS.
+    if (
+      selectedTopic === "disease-outbreaks" &&
+      (selectedState === "texas" || selectedState === "california" || selectedState === "florida")
+    ) {
+      try {
+        const result = await getDiseaseOutbreaks({ data: { state: selectedState } });
+        if (result.status === "Verified") {
+          setBriefingData(result as unknown as Record<string, unknown>);
+          setBriefingStatus("success");
+        } else if (result.status === "Unavailable") {
+          setBriefingData(null);
+          setBriefingMessage("No verified surveillance data available for this state and reporting period.");
+          setBriefingStatus("unavailable");
+        } else {
+          setBriefingData(null);
+          setBriefingMessage("Unable to retrieve live Disease Outbreak data. Please try again.");
+          setBriefingStatus("error");
+        }
+      } catch {
+        setBriefingData(null);
+        setBriefingMessage("Unable to retrieve live Disease Outbreak data. Please try again.");
         setBriefingStatus("error");
       }
       return;
