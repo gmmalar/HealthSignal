@@ -100,7 +100,11 @@ export async function getHealthBriefing({
       // [FUTURE] Freshness Agent → Trend Agent → (Health Topic Agent) → Alert Agent → Recommendation Agent
       try {
         const interpretation = await interpretHealthTopic({
-          data: { topic, normalizedData: data.normalizedData },
+          data: {
+            topic: data.topic,
+            stateLabel: data.stateLabel,
+            normalizedData: data.normalizedData,
+          },
         });
         data.summary = interpretation.summary;
         data.generatedBy = interpretation.generatedBy;
