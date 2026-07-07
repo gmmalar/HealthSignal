@@ -1,6 +1,7 @@
 import { getAirQuality } from "./airQuality.functions";
 import { getFlu } from "./flu.functions";
 import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
+import { interpretHealthTopic } from "./healthTopicAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
@@ -95,8 +96,18 @@ export async function getHealthBriefing({
 
     if (statusRaw === "success" || statusRaw === "verified") {
       const data = normalizeAdapterResult(raw, topic, state);
-      // [FUTURE] Insert specialist agents sequentially before returning:
-      //   Freshness Agent → Trend Agent → Health Topic Agent → Alert Agent → Recommendation Agent
+      // Specialist agents (sequential). Currently: Health Topic Agent.
+      // [FUTURE] Freshness Agent → Trend Agent → (Health Topic Agent) → Alert Agent → Recommendation Agent
+      try {
+        const interpretation = await interpretHealthTopic({
+          data: { topic, normalizedData: data.normalizedData },
+        });
+        data.summary = interpretation.summary;
+        data.generatedBy = interpretation.generatedBy;
+      } catch {
+        data.summary = "Health summary is temporarily unavailable.";
+        data.generatedBy = "Claude Sonnet";
+      }
       return { status: "Verified", data };
     }
     if (statusRaw === "unavailable") {
