@@ -4,7 +4,7 @@ import type { JsonValue } from "./types";
 export type FluResult =
   | {
       status: "success" | "unavailable";
-      topic: "Flu";
+      topic: "flu";
       state: string;
       stateLabel: string;
       freshness: string;
@@ -96,7 +96,7 @@ export const getFlu = createServerFn({ method: "GET" })
       if (raw.result !== 1 || !Array.isArray(raw.epidata) || raw.epidata.length === 0) {
         return {
           status: "unavailable",
-          topic: "Flu",
+          topic: "flu",
           state: data.state,
           stateLabel: label,
           freshness: "",
@@ -123,7 +123,7 @@ export const getFlu = createServerFn({ method: "GET" })
 
       return {
         status: "success",
-        topic: "Flu",
+        topic: "flu",
         state: data.state,
         stateLabel: label,
         freshness: releaseDate,
