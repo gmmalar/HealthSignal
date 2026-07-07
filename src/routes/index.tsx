@@ -7,6 +7,7 @@ import { TopicSelector } from "@/components/TopicSelector";
 import { GenerateButton } from "@/components/GenerateButton";
 import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
+import { getAirQuality } from "@/services/airQuality.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,7 +32,7 @@ function Index() {
 
   const isLoading = briefingStatus === "loading";
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (isLoading) return;
     if (!selectedState || !selectedTopic) {
       setValidationError("Please select both a state and a health topic");
@@ -40,6 +41,27 @@ function Index() {
     setValidationError(null);
     setBriefingStatus("loading");
     setBriefingData(null);
+
+    // Live source: Texas + Air Quality via AirNow. Everything else stays mock.
+    if (selectedState === "Texas" && selectedTopic === "Air Quality") {
+      try {
+        const result = await getAirQuality({ data: { state: selectedState } });
+        if (result.status === "success") {
+          setBriefingData(result.normalizedData as Record<string, unknown>);
+          setBriefingStatus("success");
+        } else if (result.status === "unavailable") {
+          setBriefingData(null);
+          setBriefingStatus("unavailable");
+        } else {
+          setBriefingData(null);
+          setBriefingStatus("error");
+        }
+      } catch {
+        setBriefingData(null);
+        setBriefingStatus("error");
+      }
+      return;
+    }
 
     setTimeout(() => {
       setBriefingData({
