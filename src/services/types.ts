@@ -18,4 +18,11 @@ export interface HealthSignalResponse {
   normalizedData: JsonValue;
   summary?: string;
   generatedBy?: string;
+  freshnessInfo?: {
+    status: "Verified" | "Recent" | "Stale" | "Unavailable";
+    cadence: "hourly" | "weekly";
+    timestamp: string;
+    badge: string;
+    reason: string;
+  };
 }
