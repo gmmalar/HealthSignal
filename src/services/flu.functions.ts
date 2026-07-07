@@ -7,6 +7,10 @@ export type FluResult =
       topic: "Flu";
       state: string;
       stateLabel: string;
+      freshness: string;
+      lastUpdated: string;
+      source: "Delphi Epidata (Carnegie Mellon)";
+      rawData: JsonValue;
       normalizedData: {
         condition: "Influenza-like Illness (ILI)";
         reportingPeriod: string;
