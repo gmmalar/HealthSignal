@@ -13,9 +13,10 @@ export type BriefingStatus =
 interface HeroCardProps {
   status: BriefingStatus;
   data: Record<string, unknown> | null;
+  message?: string;
 }
 
-export function HeroCard({ status, data }: HeroCardProps) {
+export function HeroCard({ status, data, message }: HeroCardProps) {
   const title =
     status === "loading"
       ? "Loading Briefing"
@@ -64,10 +65,20 @@ export function HeroCard({ status, data }: HeroCardProps) {
           <DataState data={data} />
         )}
         {status === "unavailable" && (
-          <MessageState message="No verified data is currently available for this selection." />
+          <MessageState
+            message={
+              message ??
+              "No verified data is currently available for this selection."
+            }
+          />
         )}
         {status === "error" && (
-           <MessageState message="Something went wrong generating this briefing. Please try again." />
+          <MessageState
+            message={
+              message ??
+              "Something went wrong generating this briefing. Please try again."
+            }
+          />
         )}
       </CardContent>
     </Card>
