@@ -16,4 +16,6 @@ export interface HealthSignalResponse {
   lastUpdated: string;
   rawData: JsonValue;
   normalizedData: JsonValue;
+  summary?: string;
+  generatedBy?: string;
 }
