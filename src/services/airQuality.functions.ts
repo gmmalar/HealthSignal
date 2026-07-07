@@ -1,5 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [k: string]: JsonValue };
+
 export type AirQualityResult =
   | {
       status: "success" | "unavailable";
@@ -10,7 +18,7 @@ export type AirQualityResult =
         state: string;
         status: "Verified" | "Unavailable";
         freshness: string;
-        rawData: Array<Record<string, unknown>>;
+        rawData: JsonValue;
       };
     }
   | { status: "error"; error: string };
@@ -43,7 +51,7 @@ export const getAirQuality = createServerFn({ method: "GET" })
       if (!res.ok) {
         return { status: "error", error: `AirNow request failed: ${res.status}` };
       }
-      const raw = (await res.json()) as Array<Record<string, unknown>>;
+      const raw = (await res.json()) as JsonValue;
 
       if (!Array.isArray(raw) || raw.length === 0) {
         return {
@@ -60,7 +68,7 @@ export const getAirQuality = createServerFn({ method: "GET" })
         };
       }
 
-      const first = raw[0];
+      const first = raw[0] as Record<string, JsonValue>;
       const dateObserved =
         typeof first.DateObserved === "string" ? first.DateObserved.trim() : "";
       const hourObserved =
