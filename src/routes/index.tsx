@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { StateSelector } from "@/components/StateSelector";
 import { TopicSelector } from "@/components/TopicSelector";
 import { GenerateButton } from "@/components/GenerateButton";
-import { HeroCard } from "@/components/HeroCard";
+import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
@@ -22,25 +22,34 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type CardState = "empty" | "loading" | "success";
-
 function Index() {
   const [selectedState, setSelectedState] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
-  const [cardState, setCardState] = useState<CardState>("empty");
-  const [isLoading, setIsLoading] = useState(false);
+  const [briefingStatus, setBriefingStatus] = useState<BriefingStatus>("empty");
+  const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const canGenerate = selectedState !== "" && selectedTopic !== "";
+  const isLoading = briefingStatus === "loading";
 
   const handleGenerate = () => {
-    if (!canGenerate) return;
-    setCardState("loading");
-    setIsLoading(true);
+    if (isLoading) return;
+    if (!selectedState || !selectedTopic) {
+      setValidationError("Please select both a state and a health topic");
+      return;
+    }
+    setValidationError(null);
+    setBriefingStatus("loading");
+    setBriefingData(null);
 
-    // Simulate a network request
     setTimeout(() => {
-      setCardState("success");
-      setIsLoading(false);
+      setBriefingData({
+        state: selectedState,
+        topic: selectedTopic,
+        status: "Verified",
+        freshness: "Mock Freshness",
+        summary: `Mock briefing for ${selectedTopic} in ${selectedState}.`,
+      });
+      setBriefingStatus("success");
     }, 2000);
   };
 
@@ -56,15 +65,19 @@ function Index() {
               <StateSelector value={selectedState} onChange={setSelectedState} />
               <TopicSelector value={selectedTopic} onChange={setSelectedTopic} />
             </div>
-            <GenerateButton
-              onClick={handleGenerate}
-              isLoading={isLoading}
-              disabled={!canGenerate}
-            />
+            <GenerateButton onClick={handleGenerate} isLoading={isLoading} />
+            {validationError && (
+              <p
+                role="alert"
+                className="text-sm font-medium text-destructive"
+              >
+                {validationError}
+              </p>
+            )}
           </div>
 
           {/* Hero Card */}
-          <HeroCard state={cardState} />
+          <HeroCard status={briefingStatus} data={briefingData} />
         </div>
       </main>
 
