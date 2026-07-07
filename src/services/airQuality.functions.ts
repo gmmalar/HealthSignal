@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-
-type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+import type { JsonValue } from "./types";
 
 export type AirQualityResult =
   | {
