@@ -3,10 +3,20 @@ import type { HealthSignalResponse, JsonValue } from "./types";
 
 const CURRENT_NNDSS = { year: "2026", week: "25" };
 
-const STATE_JURISDICTION: Record<string, { jurisdiction: string; label: string }> = {
-  texas: { jurisdiction: "Texas", label: "Texas" },
-  california: { jurisdiction: "California", label: "California" },
-  florida: { jurisdiction: "Florida", label: "Florida" },
+const STATE_JURISDICTION: Record<string, string> = {
+  texas: "Texas",
+  california: "California",
+  florida: "Florida",
+  virginia: "Virginia",
+  georgia: "Georgia",
+  illinois: "Illinois",
+  "north-carolina": "North Carolina",
+  arizona: "Arizona",
+  colorado: "Colorado",
+  ohio: "Ohio",
+  michigan: "Michigan",
+  pennsylvania: "Pennsylvania",
+  massachusetts: "Massachusetts",
 };
 
 export type DiseaseOutbreaksResult =
@@ -16,8 +26,8 @@ export type DiseaseOutbreaksResult =
 export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
   .inputValidator((data: { state: string }) => data)
   .handler(async ({ data }): Promise<DiseaseOutbreaksResult> => {
-    const entry = STATE_JURISDICTION[data.state];
-    if (!entry) {
+    const jurisdiction = STATE_JURISDICTION[data.state];
+    if (!jurisdiction) {
       return { status: "Error", error: "Unsupported state for Disease Outbreaks" };
     }
 
@@ -27,7 +37,7 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
     url.searchParams.set("label", "Measles, Indigenous");
     url.searchParams.set("year", CURRENT_NNDSS.year);
     url.searchParams.set("week", CURRENT_NNDSS.week);
-    url.searchParams.set("states", entry.jurisdiction);
+    url.searchParams.set("states", jurisdiction);
 
     try {
       const res = await fetch(url.toString());
@@ -41,10 +51,12 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
         return {
           topic: "disease-outbreaks",
           state: data.state,
-          stateLabel: entry.label,
+          stateLabel: jurisdiction,
           status: "Unavailable",
           freshness: reportingPeriod,
-            rawData: rows,
+          source: "CDC NNDSS",
+          lastUpdated: reportingPeriod,
+          rawData: rows,
           normalizedData: {
             condition: "Measles, Indigenous",
             reportingPeriod,
@@ -84,9 +96,11 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
       return {
         topic: "disease-outbreaks",
         state: data.state,
-        stateLabel: entry.label,
+        stateLabel: jurisdiction,
         status,
         freshness: reportingPeriod,
+        source: "CDC NNDSS",
+        lastUpdated: reportingPeriod,
         rawData: rows,
         normalizedData: {
           condition: "Measles, Indigenous",
