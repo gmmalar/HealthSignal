@@ -114,13 +114,8 @@ export const getFlu = createServerFn({ method: "GET" })
       }
 
       const rows = raw.epidata as Array<Record<string, JsonValue>>;
-      let freshness = "";
-      for (const row of rows) {
-        const rd = row.release_date;
-        if (typeof rd === "string" && rd > freshness) freshness = rd;
-      }
-
       const mostRecent = getMostRecentRow(rows);
+      const releaseDate = mostRecent ? String(mostRecent.release_date ?? "") : "";
       const reportingPeriod = mostRecent
         ? formatWeekEnding(mostRecent.release_date)
         : "";
@@ -131,6 +126,10 @@ export const getFlu = createServerFn({ method: "GET" })
         topic: "Flu",
         state: data.state,
         stateLabel: label,
+        freshness: releaseDate,
+        lastUpdated: releaseDate,
+        source: "Delphi Epidata (Carnegie Mellon)",
+        rawData: raw as JsonValue,
         normalizedData: {
           condition: "Influenza-like Illness (ILI)",
           reportingPeriod,
