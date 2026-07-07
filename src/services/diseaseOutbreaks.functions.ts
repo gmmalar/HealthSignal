@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { HealthSignalResponse } from "./types";
+import type { HealthSignalResponse, JsonValue } from "./types";
 
 const CURRENT_NNDSS = { year: "2026", week: "25" };
 
@@ -34,16 +34,17 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
       if (!res.ok) {
         return { status: "Error", error: `CDC NNDSS request failed: ${res.status}` };
       }
-      const raw = (await res.json()) as Array<Record<string, unknown>>;
+      const raw = (await res.json()) as JsonValue;
 
-      if (!Array.isArray(raw) || raw.length === 0) {
+      const rows = Array.isArray(raw) ? (raw as Array<{ [k: string]: JsonValue }>) : [];
+      if (rows.length === 0) {
         return {
           topic: "disease-outbreaks",
           state: data.state,
           stateLabel: entry.label,
           status: "Unavailable",
           freshness: reportingPeriod,
-          rawData: raw ?? [],
+            rawData: rows,
           normalizedData: {
             condition: "Measles, Indigenous",
             reportingPeriod,
@@ -54,7 +55,7 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
         };
       }
 
-      const row = raw[0];
+      const row = rows[0];
       const m3Flag = typeof row.m3_flag === "string" ? row.m3_flag : undefined;
       const m3Raw = row.m3;
       const m3Num = typeof m3Raw === "number" ? m3Raw : typeof m3Raw === "string" ? Number(m3Raw) : NaN;
@@ -86,7 +87,7 @@ export const getDiseaseOutbreaks = createServerFn({ method: "GET" })
         stateLabel: entry.label,
         status,
         freshness: reportingPeriod,
-        rawData: raw,
+        rawData: rows,
         normalizedData: {
           condition: "Measles, Indigenous",
           reportingPeriod,
