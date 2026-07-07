@@ -1,0 +1,113 @@
+import { getAirQuality } from "./airQuality.functions";
+import { getFlu } from "./flu.functions";
+import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
+import type { HealthSignalResponse, JsonValue } from "./types";
+
+export type BriefingOutcome =
+  | { status: "Verified"; data: HealthSignalResponse }
+  | { status: "Unavailable"; message: string }
+  | { status: "Error"; message: string };
+
+type AdapterFn = (args: { data: { state: string } }) => Promise<unknown>;
+
+interface TopicConfig {
+  fn: AdapterFn;
+  liveStates: string[];
+  unavailableMessage: string;
+  errorMessage: string;
+}
+
+const TOPIC_HANDLERS: Record<string, TopicConfig> = {
+  "air-quality": {
+    fn: getAirQuality as unknown as AdapterFn,
+    liveStates: ["texas"],
+    unavailableMessage: "No current monitoring data available for this reporting area.",
+    errorMessage: "Unable to retrieve live Air Quality data. Please try again.",
+  },
+  flu: {
+    fn: getFlu as unknown as AdapterFn,
+    liveStates: ["texas", "california", "florida"],
+    unavailableMessage:
+      "No surveillance data reported for this state during the selected reporting period.",
+    errorMessage: "Unable to retrieve live Flu data. Please try again.",
+  },
+  "disease-outbreaks": {
+    fn: getDiseaseOutbreaks as unknown as AdapterFn,
+    liveStates: ["texas", "california", "florida"],
+    unavailableMessage:
+      "No verified surveillance data available for this state and reporting period.",
+    errorMessage: "Unable to retrieve live Disease Outbreak data. Please try again.",
+  },
+};
+
+function mockBriefing(state: string, topic: string): HealthSignalResponse {
+  return {
+    topic,
+    state,
+    stateLabel: state,
+    status: "Verified",
+    freshness: "Mock Freshness",
+    source: "Mock",
+    lastUpdated: "Mock Freshness",
+    rawData: null,
+    normalizedData: {
+      summary: `Mock briefing for ${topic} in ${state}.`,
+    } as JsonValue,
+  };
+}
+
+function normalizeAdapterResult(
+  result: Record<string, unknown>,
+  topic: string,
+  state: string,
+): HealthSignalResponse {
+  const nd = (result.normalizedData ?? {}) as Record<string, unknown>;
+  const pick = (k: string) => (nd[k] ?? result[k]) as unknown;
+  return {
+    topic: (result.topic as string) ?? topic,
+    state: (result.state as string) ?? state,
+    stateLabel:
+      (result.stateLabel as string) ?? (nd.stateLabel as string) ?? state,
+    status: "Verified",
+    freshness: (pick("freshness") as string) ?? "",
+    source: (pick("source") as string) ?? "",
+    lastUpdated: (pick("lastUpdated") as string) ?? "",
+    rawData: (nd.rawData ?? result.rawData ?? null) as JsonValue,
+    normalizedData: nd as JsonValue,
+  };
+}
+
+export async function getHealthBriefing({
+  state,
+  topic,
+}: {
+  state: string;
+  topic: string;
+}): Promise<BriefingOutcome> {
+  const handler = TOPIC_HANDLERS[topic];
+
+  // Fallback to mock data when the topic has no adapter or the state is
+  // not yet wired to a live source.
+  if (!handler || !handler.liveStates.includes(state)) {
+    await new Promise((r) => setTimeout(r, 2000));
+    return { status: "Verified", data: mockBriefing(state, topic) };
+  }
+
+  try {
+    const raw = (await handler.fn({ data: { state } })) as Record<string, unknown>;
+    const statusRaw = String(raw.status ?? "").toLowerCase();
+
+    if (statusRaw === "success" || statusRaw === "verified") {
+      const data = normalizeAdapterResult(raw, topic, state);
+      // [FUTURE] Insert specialist agents sequentially before returning:
+      //   Freshness Agent → Trend Agent → Health Topic Agent → Alert Agent → Recommendation Agent
+      return { status: "Verified", data };
+    }
+    if (statusRaw === "unavailable") {
+      return { status: "Unavailable", message: handler.unavailableMessage };
+    }
+    return { status: "Error", message: handler.errorMessage };
+  } catch {
+    return { status: "Error", message: handler.errorMessage };
+  }
+}

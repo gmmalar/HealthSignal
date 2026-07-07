@@ -7,9 +7,7 @@ import { TopicSelector } from "@/components/TopicSelector";
 import { GenerateButton } from "@/components/GenerateButton";
 import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
-import { getAirQuality } from "@/services/airQuality.functions";
-import { getFlu } from "@/services/flu.functions";
-import { getDiseaseOutbreaks } from "@/services/diseaseOutbreaks.functions";
+import { getHealthBriefing } from "@/services/healthIntelligenceManager.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,94 +50,25 @@ function Index() {
     setBriefingData(null);
     setBriefingMessage(undefined);
 
-    // Live source: Texas + Air Quality via AirNow. Everything else stays mock.
-    if (selectedState === "texas" && selectedTopic === "air-quality") {
-      try {
-        const result = await getAirQuality({ data: { state: selectedState } });
-        if (result.status === "success") {
-          setBriefingData(result.normalizedData as Record<string, unknown>);
-          setBriefingStatus("success");
-        } else if (result.status === "unavailable") {
-          setBriefingData(null);
-          setBriefingMessage("No current monitoring data available for this reporting area.");
-          setBriefingStatus("unavailable");
-        } else {
-          setBriefingData(null);
-          setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
-          setBriefingStatus("error");
-        }
-      } catch {
-        setBriefingData(null);
-        setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
-        setBriefingStatus("error");
-      }
-      return;
-    }
-
-    // Live source: Flu via Delphi FluView for Texas / California / Florida.
-    if (
-      selectedTopic === "flu" &&
-      (selectedState === "texas" || selectedState === "california" || selectedState === "florida")
-    ) {
-      try {
-        const result = await getFlu({ data: { state: selectedState } });
-        if (result.status === "success") {
-          setBriefingData(result.normalizedData as unknown as Record<string, unknown>);
-          setBriefingStatus("success");
-        } else if (result.status === "unavailable") {
-          setBriefingData(null);
-          setBriefingMessage("No surveillance data reported for this state during the selected reporting period.");
-          setBriefingStatus("unavailable");
-        } else {
-          setBriefingData(null);
-          setBriefingMessage("Unable to retrieve live Flu data. Please try again.");
-          setBriefingStatus("error");
-        }
-      } catch {
-        setBriefingData(null);
-        setBriefingMessage("Unable to retrieve live Flu data. Please try again.");
-        setBriefingStatus("error");
-      }
-      return;
-    }
-
-    // Live source: Disease Outbreaks (Measles) via CDC NNDSS.
-    if (
-      selectedTopic === "disease-outbreaks" &&
-      (selectedState === "texas" || selectedState === "california" || selectedState === "florida")
-    ) {
-      try {
-        const result = await getDiseaseOutbreaks({ data: { state: selectedState } });
-        if (result.status === "Verified") {
-          setBriefingData(result as unknown as Record<string, unknown>);
-          setBriefingStatus("success");
-        } else if (result.status === "Unavailable") {
-          setBriefingData(null);
-          setBriefingMessage("No verified surveillance data available for this state and reporting period.");
-          setBriefingStatus("unavailable");
-        } else {
-          setBriefingData(null);
-          setBriefingMessage("Unable to retrieve live Disease Outbreak data. Please try again.");
-          setBriefingStatus("error");
-        }
-      } catch {
-        setBriefingData(null);
-        setBriefingMessage("Unable to retrieve live Disease Outbreak data. Please try again.");
-        setBriefingStatus("error");
-      }
-      return;
-    }
-
-    setTimeout(() => {
-      setBriefingData({
+    try {
+      const outcome = await getHealthBriefing({
         state: selectedState,
         topic: selectedTopic,
-        status: "Verified",
-        freshness: "Mock Freshness",
-        summary: `Mock briefing for ${selectedTopic} in ${selectedState}.`,
       });
-      setBriefingStatus("success");
-    }, 2000);
+      if (outcome.status === "Verified") {
+        setBriefingData(outcome.data as unknown as Record<string, unknown>);
+        setBriefingStatus("success");
+      } else if (outcome.status === "Unavailable") {
+        setBriefingMessage(outcome.message);
+        setBriefingStatus("unavailable");
+      } else {
+        setBriefingMessage(outcome.message);
+        setBriefingStatus("error");
+      }
+    } catch {
+      setBriefingMessage("Something went wrong generating your briefing.");
+      setBriefingStatus("error");
+    }
   };
 
   return (
