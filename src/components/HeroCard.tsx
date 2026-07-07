@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, ClipboardList, Loader2, XCircle } from "lucide-react";
+import { AlertTriangle, ClipboardList, Loader2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 export type BriefingStatus =
   | "empty"
@@ -113,11 +114,38 @@ function LoadingState() {
 }
 
 function DataState({ data }: { data: Record<string, unknown> }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   const summary = typeof data.summary === "string" ? data.summary : null;
-  const generatedBy =
-    typeof data.generatedBy === "string" ? data.generatedBy : null;
+  const generatedBy = typeof data.generatedBy === "string" ? data.generatedBy : null;
+  const freshness = typeof data.freshness === "string" ? data.freshness : null;
+  const lastUpdated = typeof data.lastUpdated === "string" ? data.lastUpdated : null;
+  const latestUpdate = freshness || lastUpdated || "—";
+
+  const statusValue = typeof data.status === "string" ? data.status : "Verified";
+  const isVerified = statusValue === "Verified";
+
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+            isVerified
+              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+              : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+          }`}
+        >
+          {isVerified ? "Verified" : statusValue}
+        </span>
+      </div>
+
+      <div className="space-y-1">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Latest Update
+        </p>
+        <p className="text-sm text-foreground">{latestUpdate}</p>
+      </div>
+
       {summary && (
         <div className="rounded-lg border border-border bg-background p-4">
           <p className="text-base leading-relaxed text-foreground">{summary}</p>
@@ -128,9 +156,41 @@ function DataState({ data }: { data: Record<string, unknown> }) {
           )}
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={() => setShowDetails((prev) => !prev)}
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        aria-expanded={showDetails}
+      >
+        Show Technical Details
+        {showDetails ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+      </button>
+
+      {showDetails && (
+        <div className="space-y-4 rounded-lg border border-border p-4">
+          <JsonBlock title="Raw JSON" value={data.rawData ?? null} />
+          <JsonBlock title="Normalized Data" value={data.normalizedData ?? null} />
+          <JsonBlock title="API Response" value={data} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function JsonBlock({ title, value }: { title: string; value: unknown }) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {title}
+      </p>
       <div className="rounded-lg bg-muted p-4">
         <pre className="overflow-x-auto text-sm leading-relaxed text-muted-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
+          <code>{JSON.stringify(value, null, 2)}</code>
         </pre>
       </div>
     </div>
