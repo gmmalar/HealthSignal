@@ -29,6 +29,7 @@ function Index() {
   const [briefingStatus, setBriefingStatus] = useState<BriefingStatus>("empty");
   const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [briefingMessage, setBriefingMessage] = useState<string | undefined>(undefined);
 
   const isLoading = briefingStatus === "loading";
 
@@ -41,6 +42,7 @@ function Index() {
     setValidationError(null);
     setBriefingStatus("loading");
     setBriefingData(null);
+    setBriefingMessage(undefined);
 
     // Live source: Texas + Air Quality via AirNow. Everything else stays mock.
     if (selectedState === "Texas" && selectedTopic === "Air Quality") {
@@ -51,13 +53,16 @@ function Index() {
           setBriefingStatus("success");
         } else if (result.status === "unavailable") {
           setBriefingData(null);
+          setBriefingMessage("No current monitoring data available for this reporting area.");
           setBriefingStatus("unavailable");
         } else {
           setBriefingData(null);
+          setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
           setBriefingStatus("error");
         }
       } catch {
         setBriefingData(null);
+        setBriefingMessage("Unable to retrieve live Air Quality data. Please try again.");
         setBriefingStatus("error");
       }
       return;
@@ -99,7 +104,7 @@ function Index() {
           </div>
 
           {/* Hero Card */}
-          <HeroCard status={briefingStatus} data={briefingData} />
+          <HeroCard status={briefingStatus} data={briefingData} message={briefingMessage} />
         </div>
       </main>
 
