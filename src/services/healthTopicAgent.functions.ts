@@ -52,6 +52,7 @@ async function callClaude(prompt: string): Promise<string> {
   const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
+    console.log("Calling Anthropic with model:", "claude-sonnet-5");
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -66,7 +67,10 @@ async function callClaude(prompt: string): Promise<string> {
       }),
       signal: controller.signal,
     });
-    if (!res.ok) throw new Error(`Anthropic ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Anthropic ${res.status}: ${body}`);
+    }
     const json = (await res.json()) as {
       content?: Array<{ type: string; text?: string }>;
     };
@@ -106,6 +110,9 @@ export const interpretHealthTopic = createServerFn({ method: "POST" })
       return { summary, generatedBy: "Claude Sonnet" };
     } catch (error) {
       console.error("Health Topic Agent error:", error);
-      return { summary: "Health summary is temporarily unavailable.", generatedBy: "Claude Sonnet" };
+      return {
+        summary: `DEBUG ERROR: ${error instanceof Error ? error.message : String(error)}`,
+        generatedBy: "Claude Sonnet",
+      };
     }
   });
