@@ -2,13 +2,13 @@ import { getAirQuality } from "./airQuality.functions";
 import { getFlu } from "./flu.functions";
 import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
 import { interpretHealthTopic } from "./healthTopicAgent.functions";
-import { classifyFreshness } from "./freshnessAgent.functions";
+import { classifyFreshness, type FreshnessResult } from "./freshnessAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
   | { status: "Verified"; data: HealthSignalResponse }
-  | { status: "Unavailable"; message: string }
-  | { status: "Error"; message: string };
+  | { status: "Unavailable"; message: string; freshnessInfo: FreshnessResult }
+  | { status: "Error"; message: string; freshnessInfo: FreshnessResult };
 
 type AdapterFn = (args: { data: { state: string } }) => Promise<unknown>;
 
