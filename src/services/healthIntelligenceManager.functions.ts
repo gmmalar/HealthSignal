@@ -75,6 +75,17 @@ function normalizeAdapterResult(
   };
 }
 
+function buildFreshness(
+  raw: Record<string, unknown> | null,
+  topic: string,
+): FreshnessResult {
+  const nd = (raw?.normalizedData ?? {}) as Record<string, unknown>;
+  const pick = (k: string) => (nd[k] ?? raw?.[k]) as unknown;
+  const freshness = String(pick("freshness") ?? "");
+  const lastUpdated = String(pick("lastUpdated") ?? "");
+  return classifyFreshness({ topic, freshness, lastUpdated });
+}
+
 export async function getHealthBriefing({
   state,
   topic,
