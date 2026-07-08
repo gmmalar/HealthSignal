@@ -104,6 +104,7 @@ export async function getHealthBriefing({
 
   try {
     const raw = (await handler.fn({ data: { state } })) as Record<string, unknown>;
+    const freshnessInfo = buildFreshness(raw, topic);
     const statusRaw = String(raw.status ?? "").toLowerCase();
 
     if (statusRaw === "success" || statusRaw === "verified") {
@@ -114,8 +115,8 @@ export async function getHealthBriefing({
         freshness: data.freshness,
         lastUpdated: data.lastUpdated,
       });
-      // Specialist agents (sequential). Currently: Health Topic Agent.
-      // [FUTURE] Freshness Agent → Trend Agent → (Health Topic Agent) → Alert Agent → Recommendation Agent
+      // Adapter → Normalization → Freshness Agent → Trend Agent →
+      // Health Topic Agent → Alert Agent → Recommendation Agent → Presentation
       try {
         const interpretation = await interpretHealthTopic({
           data: {
@@ -133,10 +134,10 @@ export async function getHealthBriefing({
       return { status: "Verified", data };
     }
     if (statusRaw === "unavailable") {
-      return { status: "Unavailable", message: handler.unavailableMessage };
+      return { status: "Unavailable", message: handler.unavailableMessage, freshnessInfo };
     }
-    return { status: "Error", message: handler.errorMessage };
+    return { status: "Error", message: handler.errorMessage, freshnessInfo };
   } catch {
-    return { status: "Error", message: handler.errorMessage };
+    return { status: "Error", message: handler.errorMessage, freshnessInfo: buildFreshness(null, topic) };
   }
 }
