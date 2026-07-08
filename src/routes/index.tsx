@@ -8,6 +8,7 @@ import { GenerateButton } from "@/components/GenerateButton";
 import { HeroCard, type BriefingStatus } from "@/components/HeroCard";
 import { Footer } from "@/components/Footer";
 import { getHealthBriefing } from "@/services/healthIntelligenceManager.functions";
+import { getStatesForTopic } from "@/services/stateConfig";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -42,6 +43,14 @@ function Index() {
   >(undefined);
 
   const isLoading = briefingStatus === "loading";
+
+  const handleTopicChange = (topic: string) => {
+    setSelectedTopic(topic);
+    const validStates = getStatesForTopic(topic);
+    if (!validStates.some((s) => s.value === selectedState)) {
+      setSelectedState(validStates[0]?.value ?? "");
+    }
+  };
 
   const handleGenerate = async () => {
     if (isLoading) return;
@@ -87,8 +96,8 @@ function Index() {
           {/* Controls */}
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StateSelector value={selectedState} onChange={setSelectedState} />
-              <TopicSelector value={selectedTopic} onChange={setSelectedTopic} />
+              <StateSelector value={selectedState} onChange={setSelectedState} topic={selectedTopic} />
+              <TopicSelector value={selectedTopic} onChange={handleTopicChange} />
             </div>
             <GenerateButton onClick={handleGenerate} isLoading={isLoading} />
             {validationError && (
