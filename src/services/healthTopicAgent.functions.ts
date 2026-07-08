@@ -89,10 +89,15 @@ async function callClaude(prompt: string): Promise<string> {
 
 export const interpretHealthTopic = createServerFn({ method: "POST" })
   .inputValidator(
-    (input: { topic: string; stateLabel?: string; normalizedData: JsonValue }) => input,
+    (input: {
+      topic: string;
+      stateLabel?: string;
+      normalizedData: JsonValue;
+      trendDescription?: string;
+    }) => input,
   )
   .handler(async ({ data }): Promise<HealthTopicInterpretation> => {
-    const { topic, stateLabel, normalizedData } = data;
+    const { topic, stateLabel, normalizedData, trendDescription } = data;
     const nd = (normalizedData ?? {}) as Record<string, unknown>;
 
     if (nd.dataStatus === "Unavailable") return UNAVAILABLE_RESULT;
@@ -102,7 +107,11 @@ export const interpretHealthTopic = createServerFn({ method: "POST" })
 
     const resolvedLabel =
       stateLabel || (nd.stateLabel as string | undefined) || "this location";
-    const prompt = `${builder(nd, resolvedLabel)}\n\n${GUARDRAIL}`;
+    const trendLine =
+      trendDescription && trendDescription !== "Trend unavailable."
+        ? `\n\n${trendDescription}`
+        : "";
+    const prompt = `${builder(nd, resolvedLabel)}${trendLine}\n\n${GUARDRAIL}`;
 
     try {
       console.log("Health Topic Agent input:", { topic, stateLabel, normalizedData });
