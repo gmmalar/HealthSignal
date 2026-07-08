@@ -2,13 +2,13 @@ import { getAirQuality } from "./airQuality.functions";
 import { getFlu } from "./flu.functions";
 import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
 import { interpretHealthTopic } from "./healthTopicAgent.functions";
-import { classifyFreshness } from "./freshnessAgent.functions";
+import { classifyFreshness, type FreshnessResult } from "./freshnessAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
   | { status: "Verified"; data: HealthSignalResponse }
-  | { status: "Unavailable"; message: string }
-  | { status: "Error"; message: string };
+  | { status: "Unavailable"; message: string; freshnessInfo: FreshnessResult }
+  | { status: "Error"; message: string; freshnessInfo: FreshnessResult };
 
 type AdapterFn = (args: { data: { state: string } }) => Promise<unknown>;
 
@@ -75,6 +75,17 @@ function normalizeAdapterResult(
   };
 }
 
+function buildFreshness(
+  raw: Record<string, unknown> | null,
+  topic: string,
+): FreshnessResult {
+  const nd = (raw?.normalizedData ?? {}) as Record<string, unknown>;
+  const pick = (k: string) => (nd[k] ?? raw?.[k]) as unknown;
+  const freshness = String(pick("freshness") ?? "");
+  const lastUpdated = String(pick("lastUpdated") ?? "");
+  return classifyFreshness({ topic, freshness, lastUpdated });
+}
+
 export async function getHealthBriefing({
   state,
   topic,
@@ -93,6 +104,7 @@ export async function getHealthBriefing({
 
   try {
     const raw = (await handler.fn({ data: { state } })) as Record<string, unknown>;
+    const freshnessInfo = buildFreshness(raw, topic);
     const statusRaw = String(raw.status ?? "").toLowerCase();
 
     if (statusRaw === "success" || statusRaw === "verified") {
@@ -103,8 +115,8 @@ export async function getHealthBriefing({
         freshness: data.freshness,
         lastUpdated: data.lastUpdated,
       });
-      // Specialist agents (sequential). Currently: Health Topic Agent.
-      // [FUTURE] Freshness Agent → Trend Agent → (Health Topic Agent) → Alert Agent → Recommendation Agent
+      // Adapter → Normalization → Freshness Agent → Trend Agent →
+      // Health Topic Agent → Alert Agent → Recommendation Agent → Presentation
       try {
         const interpretation = await interpretHealthTopic({
           data: {
@@ -122,10 +134,10 @@ export async function getHealthBriefing({
       return { status: "Verified", data };
     }
     if (statusRaw === "unavailable") {
-      return { status: "Unavailable", message: handler.unavailableMessage };
+      return { status: "Unavailable", message: handler.unavailableMessage, freshnessInfo };
     }
-    return { status: "Error", message: handler.errorMessage };
+    return { status: "Error", message: handler.errorMessage, freshnessInfo };
   } catch {
-    return { status: "Error", message: handler.errorMessage };
+    return { status: "Error", message: handler.errorMessage, freshnessInfo: buildFreshness(null, topic) };
   }
 }
