@@ -26,14 +26,12 @@ const TOPIC_HANDLERS: Record<string, TopicConfig> = {
   },
   flu: {
     fn: getFlu as unknown as AdapterFn,
-    unavailableMessage:
-      "No surveillance data reported for this state during the selected reporting period.",
+    unavailableMessage: "No surveillance data reported for this state during the selected reporting period.",
     errorMessage: "Unable to retrieve live Flu data. Please try again.",
   },
   "disease-outbreaks": {
     fn: getDiseaseOutbreaks as unknown as AdapterFn,
-    unavailableMessage:
-      "No verified surveillance data available for this state and reporting period.",
+    unavailableMessage: "No verified surveillance data available for this state and reporting period.",
     errorMessage: "Unable to retrieve live Disease Outbreak data. Please try again.",
   },
 };
@@ -54,18 +52,13 @@ function mockBriefing(state: string, topic: string): HealthSignalResponse {
   };
 }
 
-function normalizeAdapterResult(
-  result: Record<string, unknown>,
-  topic: string,
-  state: string,
-): HealthSignalResponse {
+function normalizeAdapterResult(result: Record<string, unknown>, topic: string, state: string): HealthSignalResponse {
   const nd = (result.normalizedData ?? {}) as Record<string, unknown>;
   const pick = (k: string) => (nd[k] ?? result[k]) as unknown;
   return {
     topic: (result.topic as string) ?? topic,
     state: (result.state as string) ?? state,
-    stateLabel:
-      (result.stateLabel as string) ?? (nd.stateLabel as string) ?? state,
+    stateLabel: (result.stateLabel as string) ?? (nd.stateLabel as string) ?? state,
     status: "Verified",
     freshness: (pick("freshness") as string) ?? "",
     source: (pick("source") as string) ?? "",
@@ -75,10 +68,7 @@ function normalizeAdapterResult(
   };
 }
 
-function buildFreshness(
-  raw: Record<string, unknown> | null,
-  topic: string,
-): FreshnessResult {
+function buildFreshness(raw: Record<string, unknown> | null, topic: string): FreshnessResult {
   const nd = (raw?.normalizedData ?? {}) as Record<string, unknown>;
   const pick = (k: string) => (nd[k] ?? raw?.[k]) as unknown;
   const freshness = String(pick("freshness") ?? "");
@@ -86,13 +76,7 @@ function buildFreshness(
   return classifyFreshness({ topic, freshness, lastUpdated });
 }
 
-export async function getHealthBriefing({
-  state,
-  topic,
-}: {
-  state: string;
-  topic: string;
-}): Promise<BriefingOutcome> {
+export async function getHealthBriefing({ state, topic }: { state: string; topic: string }): Promise<BriefingOutcome> {
   const handler = TOPIC_HANDLERS[topic];
 
   // Fallback to mock data only when the topic has no adapter at all.
@@ -109,12 +93,8 @@ export async function getHealthBriefing({
 
     if (statusRaw === "success" || statusRaw === "verified") {
       const data = normalizeAdapterResult(raw, topic, state);
-      // Freshness Agent (deterministic) runs before downstream specialist agents.
-      data.freshnessInfo = classifyFreshness({
-        topic: data.topic,
-        freshness: data.freshness,
-        lastUpdated: data.lastUpdated,
-      });
+      // Freshness Agent (deterministic) already computed above (freshnessInfo).
+      data.freshnessInfo = freshnessInfo;
       // Adapter → Normalization → Freshness Agent → Trend Agent →
       // Health Topic Agent → Alert Agent → Recommendation Agent → Presentation
       try {
