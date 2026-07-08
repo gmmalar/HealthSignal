@@ -75,6 +75,7 @@ export function HeroCard({ status, data, message, freshnessInfo }: HeroCardProps
               message ??
               "No verified data is currently available for this selection."
             }
+            freshnessInfo={freshnessInfo}
           />
         )}
         {status === "error" && (
@@ -83,6 +84,7 @@ export function HeroCard({ status, data, message, freshnessInfo }: HeroCardProps
               message ??
               "Something went wrong generating this briefing. Please try again."
             }
+            freshnessInfo={freshnessInfo}
           />
         )}
       </CardContent>
