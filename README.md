@@ -1,12 +1,4 @@
-# :rocket: HealthSignal
-
-## Public Health Intelligence Made Simple
-
-**Built for the AI Launchpad 2026 Hackathon**
-**Mission Track:** Health & Wellbeing
-**Status:** MVP Feature Complete *(Hackathon Build: July 6–10, 2026)*
-
----
+# HealthSignal
 
 **Explainable Multi-Agent AI.**
 **Built on live government public health data.**
@@ -71,7 +63,7 @@ The Health Intelligence Manager coordinates each agent in sequence, passing veri
 
 ## How HealthSignal Thinks
 
-![How HealthSignal Thinks](docs/architecture/how_healthsignal_thinks.png)
+![How HealthSignal Thinks](https://raw.githubusercontent.com/gmmalar/HealthSignal/main/docs/architecture/how_healthsignal_thinks.png)
 
 Each agent in the pipeline answers one specific question, in sequence, before the briefing is produced. This is the clearest way to see that Claude is not doing everything — it only writes the explanation after the other agents have already reasoned over the data.
 
@@ -87,13 +79,13 @@ The Health Intelligence Manager coordinates a sequential reasoning pipeline:
 
 ## System Architecture
 
-![Current Architecture](docs/architecture/current_architecture.png)
+![Current Architecture](https://raw.githubusercontent.com/gmmalar/HealthSignal/main/docs/architecture/current_architecture.png)
 
 This orchestration ensures that reasoning is transparent, repeatable, and explainable — while reserving the LLM exclusively for communication. Three live government data sources feed a shared adapter and normalization layer. Three deterministic agents — Freshness, Trend, and Alert — run before Claude is ever invoked. Claude's Health Topic Agent is used exclusively to translate already-verified findings into a plain-language summary; it never determines facts.
 
 ## Roadmap Preview
 
-![Future Platform Vision](docs/architecture/future_platform.png)
+![Future Platform Vision](https://raw.githubusercontent.com/gmmalar/HealthSignal/main/docs/architecture/future_platform.png)
 
 A conceptual view of where HealthSignal is headed — clearly separated from what's built today. Full roadmap details are further below.
 
