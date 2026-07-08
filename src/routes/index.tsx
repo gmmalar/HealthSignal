@@ -53,6 +53,7 @@ function Index() {
     setBriefingStatus("loading");
     setBriefingData(null);
     setBriefingMessage(undefined);
+    setFreshnessInfo(undefined);
 
     try {
       const outcome = await getHealthBriefing({
@@ -64,9 +65,11 @@ function Index() {
         setBriefingStatus("success");
       } else if (outcome.status === "Unavailable") {
         setBriefingMessage(outcome.message);
+        setFreshnessInfo(outcome.freshnessInfo);
         setBriefingStatus("unavailable");
       } else {
         setBriefingMessage(outcome.message);
+        setFreshnessInfo(outcome.freshnessInfo);
         setBriefingStatus("error");
       }
     } catch {
