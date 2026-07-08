@@ -36,6 +36,10 @@ function Index() {
   const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [briefingMessage, setBriefingMessage] = useState<string | undefined>(undefined);
+  const [freshnessInfo, setFreshnessInfo] = useState<
+    | { status: "Verified" | "Recent" | "Stale" | "Unavailable"; badge: string }
+    | undefined
+  >(undefined);
 
   const isLoading = briefingStatus === "loading";
 
