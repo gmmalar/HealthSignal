@@ -15,9 +15,13 @@ interface HeroCardProps {
   status: BriefingStatus;
   data: Record<string, unknown> | null;
   message?: string;
+  freshnessInfo?: {
+    status: "Verified" | "Recent" | "Stale" | "Unavailable";
+    badge: string;
+  };
 }
 
-export function HeroCard({ status, data, message }: HeroCardProps) {
+export function HeroCard({ status, data, message, freshnessInfo }: HeroCardProps) {
   const title =
     status === "loading"
       ? "Loading Briefing"
@@ -71,6 +75,7 @@ export function HeroCard({ status, data, message }: HeroCardProps) {
               message ??
               "No verified data is currently available for this selection."
             }
+            freshnessInfo={freshnessInfo}
           />
         )}
         {status === "error" && (
@@ -79,6 +84,7 @@ export function HeroCard({ status, data, message }: HeroCardProps) {
               message ??
               "Something went wrong generating this briefing. Please try again."
             }
+            freshnessInfo={freshnessInfo}
           />
         )}
       </CardContent>
@@ -208,10 +214,33 @@ function JsonBlock({ title, value }: { title: string; value: unknown }) {
   );
 }
 
-function MessageState({ message }: { message: string }) {
+function MessageState({
+  message,
+  freshnessInfo,
+}: {
+  message: string;
+  freshnessInfo?: {
+    status: "Verified" | "Recent" | "Stale" | "Unavailable";
+    badge: string;
+  };
+}) {
+  const freshnessStatus = freshnessInfo?.status ?? "Unavailable";
+  const freshnessBadge = freshnessInfo?.badge ?? "—";
+
   return (
-    <div className="py-8 text-center text-sm text-muted-foreground">
-      {message}
+    <div className="space-y-4 py-8 text-center">
+      <div className="flex items-center justify-center gap-2">
+        <span
+          className="inline-block h-2.5 w-2.5 rounded-full bg-muted-foreground"
+          aria-hidden="true"
+        />
+        <span className="text-sm font-medium text-foreground">
+          {freshnessStatus}
+        </span>
+        <span className="text-sm text-muted-foreground">·</span>
+        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
+      </div>
+      <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );
 }

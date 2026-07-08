@@ -36,6 +36,10 @@ function Index() {
   const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [briefingMessage, setBriefingMessage] = useState<string | undefined>(undefined);
+  const [freshnessInfo, setFreshnessInfo] = useState<
+    | { status: "Verified" | "Recent" | "Stale" | "Unavailable"; badge: string }
+    | undefined
+  >(undefined);
 
   const isLoading = briefingStatus === "loading";
 
@@ -49,6 +53,7 @@ function Index() {
     setBriefingStatus("loading");
     setBriefingData(null);
     setBriefingMessage(undefined);
+    setFreshnessInfo(undefined);
 
     try {
       const outcome = await getHealthBriefing({
@@ -60,9 +65,11 @@ function Index() {
         setBriefingStatus("success");
       } else if (outcome.status === "Unavailable") {
         setBriefingMessage(outcome.message);
+        setFreshnessInfo(outcome.freshnessInfo);
         setBriefingStatus("unavailable");
       } else {
         setBriefingMessage(outcome.message);
+        setFreshnessInfo(outcome.freshnessInfo);
         setBriefingStatus("error");
       }
     } catch {
@@ -92,7 +99,12 @@ function Index() {
           </div>
 
           {/* Hero Card */}
-          <HeroCard status={briefingStatus} data={briefingData} message={briefingMessage} />
+          <HeroCard
+            status={briefingStatus}
+            data={briefingData}
+            message={briefingMessage}
+            freshnessInfo={freshnessInfo}
+          />
         </div>
       </main>
 
