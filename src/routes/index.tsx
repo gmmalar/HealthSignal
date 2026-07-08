@@ -31,8 +31,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedState, setSelectedState] = useState("texas");
+  const [selectedTopic, setSelectedTopic] = useState("air-quality");
   const [briefingStatus, setBriefingStatus] = useState<BriefingStatus>("empty");
   const [briefingData, setBriefingData] = useState<Record<string, unknown> | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
