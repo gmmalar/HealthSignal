@@ -4,6 +4,7 @@ import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
 import { interpretHealthTopic } from "./healthTopicAgent.functions";
 import { classifyFreshness, type FreshnessResult } from "./freshnessAgent.functions";
 import { classifyTrend, type TrendResult } from "./trendAgent.functions";
+import { classifyAlert } from "./alertAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
@@ -130,6 +131,13 @@ export async function getHealthBriefing({ state, topic }: { state: string; topic
         data.summary = "Health summary is temporarily unavailable.";
         data.generatedBy = "Claude Sonnet";
       }
+      // Adapter → Normalization → Freshness Agent → Trend Agent →
+      // Health Topic Agent (Claude) → Alert Agent → Presentation
+      data.alertInfo = classifyAlert({
+        topic: data.topic,
+        normalizedData: data.normalizedData as Record<string, unknown>,
+        trendInfo: data.trendInfo,
+      });
       return { status: "Verified", data };
     }
     if (statusRaw === "unavailable") {
