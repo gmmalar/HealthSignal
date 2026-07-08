@@ -3,6 +3,7 @@ import { getFlu } from "./flu.functions";
 import { getDiseaseOutbreaks } from "./diseaseOutbreaks.functions";
 import { interpretHealthTopic } from "./healthTopicAgent.functions";
 import { classifyFreshness, type FreshnessResult } from "./freshnessAgent.functions";
+import { classifyTrend, type TrendResult } from "./trendAgent.functions";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
 export type BriefingOutcome =
@@ -55,6 +56,9 @@ function mockBriefing(state: string, topic: string): HealthSignalResponse {
 function normalizeAdapterResult(result: Record<string, unknown>, topic: string, state: string): HealthSignalResponse {
   const nd = (result.normalizedData ?? {}) as Record<string, unknown>;
   const pick = (k: string) => (nd[k] ?? result[k]) as unknown;
+  const historicalData = Array.isArray(result.historicalData)
+    ? (result.historicalData as Array<{ order: number; period: string; value: number }>)
+    : undefined;
   return {
     topic: (result.topic as string) ?? topic,
     state: (result.state as string) ?? state,
@@ -65,6 +69,7 @@ function normalizeAdapterResult(result: Record<string, unknown>, topic: string, 
     lastUpdated: (pick("lastUpdated") as string) ?? "",
     rawData: (nd.rawData ?? result.rawData ?? null) as JsonValue,
     normalizedData: nd as JsonValue,
+    historicalData,
   };
 }
 
@@ -74,6 +79,11 @@ function buildFreshness(raw: Record<string, unknown> | null, topic: string): Fre
   const freshness = String(pick("freshness") ?? "");
   const lastUpdated = String(pick("lastUpdated") ?? "");
   return classifyFreshness({ topic, freshness, lastUpdated });
+}
+
+function describeTrend(trend: TrendResult): string {
+  if (!trend.supported) return "Trend unavailable.";
+  return `Trend: ${trend.direction}. Strength: ${trend.strength}. ${trend.consecutivePeriods} consecutive period(s) in this direction (based on ${trend.historyLength} observations).`;
 }
 
 export async function getHealthBriefing({ state, topic }: { state: string; topic: string }): Promise<BriefingOutcome> {
@@ -93,8 +103,16 @@ export async function getHealthBriefing({ state, topic }: { state: string; topic
 
     if (statusRaw === "success" || statusRaw === "verified") {
       const data = normalizeAdapterResult(raw, topic, state);
-      // Freshness Agent (deterministic) already computed above (freshnessInfo).
       data.freshnessInfo = freshnessInfo;
+      // Trend Agent (deterministic).
+      data.trendInfo =
+        data.historicalData && data.historicalData.length >= 2
+          ? classifyTrend({ historicalData: data.historicalData })
+          : {
+              supported: false,
+              reason:
+                "Trend Agent requires multi-period historical data; not yet available for this topic.",
+            };
       // Adapter → Normalization → Freshness Agent → Trend Agent →
       // Health Topic Agent → Alert Agent → Recommendation Agent → Presentation
       try {
@@ -103,6 +121,7 @@ export async function getHealthBriefing({ state, topic }: { state: string; topic
             topic: data.topic,
             stateLabel: data.stateLabel,
             normalizedData: data.normalizedData,
+            trendDescription: describeTrend(data.trendInfo),
           },
         });
         data.summary = interpretation.summary;
