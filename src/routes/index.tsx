@@ -99,7 +99,12 @@ function Index() {
           </div>
 
           {/* Hero Card */}
-          <HeroCard status={briefingStatus} data={briefingData} message={briefingMessage} />
+          <HeroCard
+            status={briefingStatus}
+            data={briefingData}
+            message={briefingMessage}
+            freshnessInfo={freshnessInfo}
+          />
         </div>
       </main>
 
