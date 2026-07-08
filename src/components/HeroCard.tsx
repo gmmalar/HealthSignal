@@ -15,9 +15,13 @@ interface HeroCardProps {
   status: BriefingStatus;
   data: Record<string, unknown> | null;
   message?: string;
+  freshnessInfo?: {
+    status: "Verified" | "Recent" | "Stale" | "Unavailable";
+    badge: string;
+  };
 }
 
-export function HeroCard({ status, data, message }: HeroCardProps) {
+export function HeroCard({ status, data, message, freshnessInfo }: HeroCardProps) {
   const title =
     status === "loading"
       ? "Loading Briefing"
