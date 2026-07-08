@@ -1,179 +1,205 @@
-# 🚀 HealthSignal
+# :rocket: HealthSignal
 
 ## Public Health Intelligence Made Simple
 
 **Built for the AI Launchpad 2026 Hackathon**
 **Mission Track:** Health & Wellbeing
-**Status:** 🚧 In Development *(Hackathon Build: July 6–10, 2026)*
+**Status:** MVP Feature Complete *(Hackathon Build: July 6–10, 2026)*
 
 ---
 
-## Overview
+**Explainable Multi-Agent AI.**
+**Built on live government public health data.**
 
-HealthSignal transforms trusted public health data into personalized health briefings that help people make informed everyday decisions in under 30 seconds.
-
-Instead of asking people to interpret surveillance reports and technical public health data, HealthSignal answers three simple questions:
-
-- **What is happening?**
-- **How serious is it?**
-- **What should I do?**
+An explainable multi-agent AI platform for public health intelligence that combines live government surveillance data with deterministic reasoning and LLM-powered communication.
 
 ---
 
-## The Problem
+## Problem
 
-Trusted public health information is widely available, but it is often difficult for everyday people to understand and use. Parents, caregivers, older adults, and travelers frequently need timely guidance without having to interpret surveillance reports, technical metrics, or multiple government data sources.
+Trusted public health information is widely available, but it's often difficult for everyday people to understand and use. Valuable information is spread across surveillance systems and technical public health reports, making it difficult to quickly understand what is happening locally and whether the information is still current. Feedback from an early HealthSignal prototype consistently highlighted the need for live data, location-specific insight, and visible data freshness — revealing that the real challenge wasn't access to information, but confidence that the information was current and relevant.
 
----
+## Solution
 
-## The Solution
+HealthSignal turns live government public health data into clear, trustworthy, plain-language briefings across three health topics and up to 13 U.S. states.
 
-HealthSignal is a multi-agent AI system that transforms trusted public health data into a personalized health briefing in under 30 seconds.
+HealthSignal answers three simple questions for every briefing: **What is happening? How serious is it? What should I do?**
 
-By combining live public health data, AI-powered trend analysis, cadence-aware data freshness verification, and location-aware recommendations, HealthSignal delivers information people can trust, understand, and act upon.
-
----
-
-## Why HealthSignal?
-
-HealthSignal is built on three principles:
-
-### ✅ Trust
-Uses verified public health data with visible, cadence-aware freshness indicators so users know when information was last updated — and why a weekly source and an hourly source show different timestamps.
-
-### ✅ Clarity
-Transforms complex surveillance data into plain language health briefings that anyone can understand.
-
-### ✅ Action
-Provides personalized recommendations that help people make informed everyday decisions.
+**Target users:** parents, caregivers, older adults, travelers, and anyone seeking trusted public health information when making everyday decisions.
 
 ---
 
-## Key Features
+## Explainable AI by Design
 
-- Live public health data from trusted government sources
-- State and health topic selection (Flu, Air Quality, Disease Outbreaks for V1)
-- Personalized plain-language health briefings
-- AI-powered trend analysis
-- Cadence-aware data freshness verification (hourly vs. weekly sources)
-- Risk scoring
-- Personalized recommendations
-- Favorite locations
-- Historical trend tracking
+HealthSignal separates deterministic reasoning from language generation. A Health Intelligence Manager orchestrates three deterministic specialist agents — Freshness, Trend, and Alert — before invoking Claude to generate a plain-language briefing.
 
----
+**Claude is used exactly once in the pipeline — only to explain, never to decide.**
 
-## AI Architecture
+Many AI projects look like:
 
-HealthSignal uses a coordinated multi-agent architecture: one orchestrator and five specialist agents.
-
-```text
-                     Health Intelligence Manager
-                                │
-        ┌───────────────────────┼────────────────────────┐
-        │                       │                        │
- Data Freshness Agent     Trend Analysis Agent    Health Topic Agent
-        │                       │                        │
-        └──────────────┬────────┴───────────────┬────────┘
-                       │                        │
-                 Alert Agent              Recommendation Agent
-                       │
-                       ▼
-         Personalized Health Briefing
+```
+LLM → Output
 ```
 
-Each specialist AI agent performs a dedicated task before the Health Intelligence Manager synthesizes the results into a single personalized health briefing. The Alert Agent runs before the Recommendation Agent, since the Recommendation Agent's output depends on the Alert Agent's risk level.
+HealthSignal looks like:
 
-Full one-page specs for each agent (Purpose, Input, Output, Prompt, Guardrails, Failure Handling) are in [`docs/agent-specs.md`](./docs/agent-specs.md).
+```
+Government data → Deterministic reasoning → LLM explanation
+```
+
+That's a fundamentally different architecture.
+
+### Why a Multi-Agent Architecture?
+
+Instead of relying on a single LLM prompt, HealthSignal separates reasoning into specialized agents:
+
+- **Freshness Agent** validates whether data is current.
+- **Trend Agent** analyzes historical changes.
+- **Alert Agent** evaluates attention level using deterministic rules.
+- **Health Topic Agent** converts verified findings into natural language.
+
+The Health Intelligence Manager coordinates each agent in sequence, passing verified outputs between agents so that every stage builds on validated information before the final explanation is generated. This separation improves transparency and explainability, and reduces hallucination risk by ensuring factual reasoning occurs before language generation.
+
+### Design Principles
+
+- **Live government data only** — never simulated or fabricated.
+- **Deterministic reasoning before LLM generation** — factual analysis is rule-based and auditable.
+- **Explainable AI** — every reasoning step can be inspected independently.
+- **Graceful handling of missing data** — HealthSignal never invents unavailable public health information.
+
+---
+
+## How HealthSignal Thinks
+
+![How HealthSignal Thinks](docs/architecture/how_healthsignal_thinks.png)
+
+Each agent in the pipeline answers one specific question, in sequence, before the briefing is produced. This is the clearest way to see that Claude is not doing everything — it only writes the explanation after the other agents have already reasoned over the data.
+
+## AI Orchestration Flow
+
+The Health Intelligence Manager coordinates a sequential reasoning pipeline:
+
+1. Retrieve live government surveillance data.
+2. Normalize data into a common structure.
+3. Run deterministic Freshness, Trend, and Alert agents.
+4. Pass verified findings to Claude.
+5. Generate a plain-language health briefing.
+
+## System Architecture
+
+![Current Architecture](docs/architecture/current_architecture.png)
+
+This orchestration ensures that reasoning is transparent, repeatable, and explainable — while reserving the LLM exclusively for communication. Three live government data sources feed a shared adapter and normalization layer. Three deterministic agents — Freshness, Trend, and Alert — run before Claude is ever invoked. Claude's Health Topic Agent is used exclusively to translate already-verified findings into a plain-language summary; it never determines facts.
+
+## Roadmap Preview
+
+![Future Platform Vision](docs/architecture/future_platform.png)
+
+A conceptual view of where HealthSignal is headed — clearly separated from what's built today. Full roadmap details are further below.
+
+---
+
+## Live Data Coverage
+
+| Topic | Live Source | States | Validation |
+|---|---|---|---|
+| Air Quality | EPA AirNow | 4 | :white_check_mark: 4/4 verified |
+| Flu | Delphi Epidata | 7 | :white_check_mark: 7/7 verified |
+| Disease Outbreaks | CDC NNDSS | 13 | :white_check_mark: 13/13 verified |
+
+Every supported state/topic combination was validated against live government data before submission. Coverage varies by topic because each public health data source has different geographic availability. The State selector is topic-aware — only combinations with verified live data are selectable, so every option in the app is guaranteed to return real results.
+
+## AI Agents
+
+| Agent | Execution | Purpose |
+|---|---|---|
+| **Freshness Agent** | **Deterministic** | Validates publication cadence and freshness |
+| **Trend Agent** | **Deterministic** | Detects direction and strength of change |
+| **Alert Agent** | **Deterministic** | Evaluates attention level using rules |
+| Health Topic Agent | Claude Sonnet (LLM) | Produces plain-language summaries |
+
+Three of four agents are fully deterministic. Claude is used exactly once in the pipeline — only to explain, never to decide.
+
+---
+
+## Built vs Planned
+
+| Feature | MVP | Planned |
+|---|---|---|
+| Live EPA AirNow | :white_check_mark: | |
+| Live Delphi Epidata | :white_check_mark: | |
+| Live CDC NNDSS | :white_check_mark: | |
+| Freshness Agent | :white_check_mark: | |
+| Trend Agent | :white_check_mark: | |
+| Alert Agent | :white_check_mark: | |
+| Health Topic Agent (Claude) | :white_check_mark: | |
+| Dynamic weekly release detection | | :soon: |
+| Historical data persistence | | :soon: |
+| n8n orchestration | | :soon: |
+| Personalized notifications | | :soon: |
 
 ---
 
 ## Technology Stack
 
-| Layer | Technology |
-|--------|------------|
-| **Frontend** | Lovable |
-| **AI** | Claude API |
-| **Workflow Orchestration** | n8n |
-| **Database & Memory** | Supabase (via Lovable Cloud) |
-| **Flu Data** | Delphi Epidata API (mirrors CDC FluView/ILINet) |
-| **Disease Outbreak Data** | CDC NNDSS Weekly Data — unified dataset, locked to Measles (Indigenous) for V1 |
-| **Air Quality Data** | EPA AirNow API |
-| **Heat Risk Data** | NWS/NOAA *(optional — see roadmap)* |
-| **Version Control** | GitHub |
+**Frontend**
+Lovable, React, TypeScript, TanStack Start
 
-**Note on RSV:** RSV was evaluated during the hackathon build using the CDC NREVSS public dataset and deferred to a future version after two independent checks confirmed the public endpoint returns only historical 2015 data rather than current surveillance. Since HealthSignal's core principle is presenting only verified, current information, RSV was deferred rather than shipped with misleading freshness data. The architecture is topic-agnostic, so adding RSV later requires only a reliable current data source, not new agent logic.
+**AI**
+Claude Sonnet
 
----
+**Government Data Sources**
+EPA AirNow, CDC NNDSS, Delphi Epidata
 
-## Screenshots
+**Architecture**
+Multi-agent orchestration, deterministic rule engines
 
-🚧 Screenshots will be added during the hackathon build.
+**Version Control**
+GitHub
 
----
+## Known Limitations
 
-## Live Demo
+**Weekly Data Release Cadence**
 
-🌐 **Live Application** — *(Lovable deployment link will be added after deployment)*
+Weekly surveillance data follows the publication cadence of the underlying public health sources. Flu surveillance is retrieved from the latest available Delphi weekly release, and Disease Outbreak surveillance is currently aligned with the latest validated CDC NNDSS publication (Week 25, 2026 at the time of submission). During validation, Week 26 was confirmed as not yet published by either source, so the displayed data represents the most current verified release available.
 
-🎥 **Demo Video** — *(Loom or YouTube demo link will be added after recording)*
+The current MVP references the latest validated reporting week explicitly. A future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week.
 
----
+**Trend Detection Coverage**
 
-## Documentation
-
-- [Product Requirements Document](./docs/prd.md)
-- [Design System](./docs/design-system.md)
-- [Agent Specification Sheets](./docs/agent-specs.md)
-- [API Notes](./docs/api-notes.md)
-- [Supabase Schema](./docs/supabase-schema.md)
+The Trend Agent is fully generic and topic-agnostic, but currently only the Flu adapter retrieves multi-period historical data. Air Quality and Disease Outbreaks return single-period snapshots today, so trend analysis is not yet available for those topics — the architecture requires no changes to support them once their adapters are extended to retrieve historical data.
 
 ---
 
-## Product Roadmap
+## Roadmap
 
-### Version 1 — Hackathon MVP
-- Live public health data — **required:** Flu, Air Quality, Disease Outbreaks; **optional/stretch:** Heat Risk
-- 15 U.S. states
-- AI-generated health briefings
-- Trend analysis
-- Risk scoring
-- Cadence-aware data freshness indicators
-- Favorite locations
+**Near-term**
+- Automatic weekly release detection
+- Historical Air Quality support
+- Historical Disease Outbreak support
+- Expanded state coverage
 
-### Version 1.1 — Fast Follow
-- RSV, once a public dataset with genuinely current surveillance data is identified
+**Long-term**
+- Persistent briefing history (Supabase)
+- Automated orchestration (n8n)
+- Personalized notifications
+- Personalized recommendations
 
-### Version 2 — Personalization
-- User accounts
-- Saved preferences
-- Personalized alerts
-- Push notifications
-- Saved health briefings
-- Enhanced recommendation engine
-- Heat Risk (if not completed in V1)
-
-### Version 3 — Platform Expansion
-- Coverage for all 50 U.S. states
-- County and ZIP code level insights
-- Additional public health topics
-- Wearable integration
-- Family health monitoring
-- Weekly AI-generated health summaries
+The items above are explicitly planned work and are not part of the current MVP.
 
 ---
 
-## Vision
+## Status
 
-HealthSignal is designed as a scalable AI platform that transforms trusted public health data into personalized, actionable health intelligence.
+**HealthSignal MVP is feature complete.** All live data adapters have been validated against every supported state and are frozen for the remainder of the hackathon. All four AI agents — orchestrated by the Health Intelligence Manager — are built, wired, and verified end-to-end. Remaining work is limited to documentation, presentation assets, and hackathon submission materials.
 
-Its multi-agent architecture is designed to extend beyond the hackathon by supporting additional health topics, broader geographic coverage, and richer personalization. Future enhancements include county-level insights, family health monitoring, wearable integrations, and AI-generated weekly health summaries, creating a trusted digital health companion for individuals, families, caregivers, and community organizations.
+## Credits
 
----
+Health reasoning is performed using deterministic rule-based agents. Plain-language summaries are generated by Claude Sonnet. Public health data provided by the U.S. CDC, EPA, and the Delphi Group at Carnegie Mellon University.
 
 ## About
 
-**Built by ThulirX Labs · Malar Manogaran (Solo Builder)**
+Built by ThulirX Labs · Malar Manogaran (Solo Builder)
 
 AI Product Builder | Digital Health & Data Products | Product Strategy
 
@@ -181,5 +207,4 @@ HealthSignal was inspired by firsthand experience building public health data pr
 
 ---
 
-⭐ *Thank you for visiting the HealthSignal repository.*
-
+:star: Thank you for visiting the HealthSignal repository.
