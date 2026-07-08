@@ -1,3 +1,5 @@
+import type { TrendResult } from "./trendAgent.functions";
+
 export type JsonValue =
   | string
   | number
@@ -16,6 +18,8 @@ export interface HealthSignalResponse {
   lastUpdated: string;
   rawData: JsonValue;
   normalizedData: JsonValue;
+  historicalData?: Array<{ order: number; period: string; value: number }>;
+  trendInfo?: TrendResult;
   summary?: string;
   generatedBy?: string;
   freshnessInfo?: {

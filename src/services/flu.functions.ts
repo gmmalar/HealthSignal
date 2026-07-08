@@ -11,6 +11,7 @@ export type FluResult =
       lastUpdated: string;
       source: "Delphi Epidata (Carnegie Mellon)";
       rawData: JsonValue;
+      historicalData?: Array<{ order: number; period: string; value: number }>;
       normalizedData: {
         condition: "Influenza-like Illness (ILI)";
         reportingPeriod: string;
@@ -130,6 +131,11 @@ export const getFlu = createServerFn({ method: "GET" })
         lastUpdated: releaseDate,
         source: "Delphi Epidata (Carnegie Mellon)",
         rawData: raw as JsonValue,
+        historicalData: rows.map((r) => ({
+          order: Number(r.epiweek),
+          period: String(r.epiweek),
+          value: toActivityLevel(r.wili),
+        })),
         normalizedData: {
           condition: "Influenza-like Illness (ILI)",
           reportingPeriod,
