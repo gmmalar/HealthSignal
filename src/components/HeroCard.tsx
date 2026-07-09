@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, ClipboardList, Loader2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  ClipboardList,
+  Loader2,
+  ShieldCheck,
+  TrendingUp,
+  TriangleAlert,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 export type BriefingStatus =
   | "empty"
@@ -205,21 +216,33 @@ function DataState({ data }: { data: Record<string, unknown> }) {
       {showDetails && (
         <div className="space-y-6 rounded-lg border border-border p-4">
           <div className="space-y-3 pb-4 border-b border-border">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="text-sm font-semibold text-primary">
               AI Pipeline
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground break-words">
-              <li>✓ Freshness Agent — {freshnessBadge}</li>
-              <li>
-                ✓ Trend Agent —{" "}
-                {trendInfo?.supported
-                  ? `${trendInfo.direction}, ${trendInfo.strength} strength, ${trendInfo.consecutivePeriods} consecutive periods`
-                  : "Not available for this topic"}
+              <li className="flex items-start gap-2">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span>Freshness Agent — {freshnessBadge}</span>
               </li>
-              <li>
-                ✓ Alert Agent — {alertInfo?.level ?? "—"} · {alertInfo?.reason ?? "—"}
+              <li className="flex items-start gap-2">
+                <TrendingUp className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span>
+                  Trend Agent —{" "}
+                  {trendInfo?.supported
+                    ? `${trendInfo.direction}, ${trendInfo.strength} strength, ${trendInfo.consecutivePeriods} consecutive periods`
+                    : "Not available for this topic"}
+                </span>
               </li>
-              <li>✓ Health Topic Agent (Claude) — Summary generated</li>
+              <li className="flex items-start gap-2">
+                <TriangleAlert className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span>
+                  Alert Agent — {alertInfo?.level ?? "—"} · {alertInfo?.reason ?? "—"}
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Bot className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span>Health Topic Agent (Claude) — Summary generated</span>
+              </li>
             </ul>
           </div>
           <JsonBlock title="Raw JSON" value={data.rawData ?? null} />
