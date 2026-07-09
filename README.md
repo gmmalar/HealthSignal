@@ -120,7 +120,7 @@ Every supported state/topic combination was validated against live government da
 | **Freshness Agent** | **Deterministic** | Validates publication cadence and freshness |
 | **Trend Agent** | **Deterministic** | Detects direction and strength of change |
 | **Alert Agent** | **Deterministic** | Evaluates attention level using rules |
-| Health Topic Agent | LLM (Claude API - Sonnet)| Produces plain-language summaries |
+| Health Topic Agent | Claude API (Sonnet)| Produces plain-language summaries |
 
 Three of four agents are fully deterministic. Claude is used exactly once in the pipeline — only to explain, never to decide.
 
@@ -180,8 +180,8 @@ The easiest way to experience HealthSignal is through the live application:
 
 #### Prerequisites
 
-- Node.js 18+
-- npm
+Node.js 18+
+Bun (or npm as a fallback — see note below)
 
 #### Setup
 
@@ -191,6 +191,7 @@ cd HealthSignal
 bun install
 bun run dev
 ```
+This project uses Bun (see bun.lock). If you prefer npm, delete bun.lock first, then run npm install and npm run dev instead.
 
 Open the local URL shown in your terminal (typically `http://localhost:5173`).
 
@@ -199,7 +200,7 @@ Open the local URL shown in your terminal (typically `http://localhost:5173`).
 HealthSignal's AI agents and live data adapters (EPA AirNow, Delphi Epidata, CDC NNDSS, Claude) run as **server-side functions in Lovable Cloud**, not as client-side environment variables. These secrets (`AIRNOW_API_KEY`, `ANTHROPIC_API_KEY`) are configured in the Lovable Cloud project and are not included in this repository for security reasons.
 
 As a result:
-- Running `npm run dev` locally will start the frontend UI, but briefing generation will not work without access to the same Lovable Cloud backend.
+- Running `bun run dev` locally will start the frontend UI, but briefing generation will not work without access to the same Lovable Cloud backend.
 - To fully run HealthSignal end-to-end, use the live demo link above, or fork the project into your own Lovable workspace and configure your own API keys under **Cloud → Secrets**.
 
 ---
