@@ -1,7 +1,7 @@
-# HealthSignal
+![HealthSignal](docs/screenshots/HealthSignal_Homepage.jpg)
 
-**Explainable Multi-Agent AI.**
-**Built on live government public health data.**
+# HealthSignal
+Explainable Multi-Agent AI. Built on live government public health data.
 
 HealthSignal transforms live government surveillance data into trustworthy, plain-language public health briefings using deterministic AI reasoning and LLM-powered communication.
 
@@ -20,6 +20,8 @@ HealthSignal answers three simple questions for every briefing: **What is happen
 
 **Target users:** parents, caregivers, older adults, travelers, and anyone seeking trusted public health information when making everyday decisions.
 
+
+![HealthSignal homepage](docs/screenshots/HealthSignal_Homepage.jpg)
 ---
 
 ## Explainable AI by Design
