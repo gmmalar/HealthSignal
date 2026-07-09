@@ -261,16 +261,16 @@ function MessageState({
 
   return (
     <div className="space-y-4 py-8 text-center">
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <span
-          className="inline-block h-2.5 w-2.5 rounded-full bg-muted-foreground"
+          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-muted-foreground"
           aria-hidden="true"
         />
-        <span className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium leading-none text-foreground">
           {freshnessStatus}
         </span>
-        <span className="text-sm text-muted-foreground">·</span>
-        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
+        <span className="text-sm leading-none text-muted-foreground">·</span>
+        <span className="text-sm leading-none text-muted-foreground">{freshnessBadge}</span>
       </div>
       <p className="text-sm text-muted-foreground">{message}</p>
     </div>
