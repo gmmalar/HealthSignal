@@ -1,8 +1,6 @@
 ![HealthSignal](docs/screenshots/HealthSignal_NorthCarolina_AirQuality_Hero.jpg)
 
 # HealthSignal
-
-# HealthSignal
 Explainable Multi-Agent AI. Built on live government public health data.
 
 HealthSignal transforms live government surveillance data into trustworthy, plain-language public health briefings using deterministic AI reasoning and LLM-powered communication.
