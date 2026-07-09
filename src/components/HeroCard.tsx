@@ -203,12 +203,12 @@ function DataState({ data }: { data: Record<string, unknown> }) {
       </button>
 
       {showDetails && (
-        <div className="space-y-4 rounded-lg border border-border p-4">
-          <div className="space-y-2">
+        <div className="space-y-6 rounded-lg border border-border p-4">
+          <div className="space-y-3 pb-4 border-b border-border">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               AI Pipeline
             </p>
-            <ul className="space-y-1 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-muted-foreground break-words">
               <li>✓ Freshness Agent — {freshnessBadge}</li>
               <li>
                 ✓ Trend Agent —{" "}
