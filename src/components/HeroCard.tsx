@@ -164,17 +164,17 @@ function DataState({ data }: { data: Record<string, unknown> }) {
           : "bg-muted-foreground";
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`inline-block h-2.5 w-2.5 rounded-full ${dotClass}`}
+          className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`}
           aria-hidden="true"
         />
-        <span className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium leading-none text-foreground">
           {freshnessStatus}
         </span>
-        <span className="text-sm text-muted-foreground">·</span>
-        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
+        <span className="text-sm leading-none text-muted-foreground">·</span>
+        <span className="text-sm leading-none text-muted-foreground">{freshnessBadge}</span>
       </div>
 
       {summary && (
@@ -203,12 +203,12 @@ function DataState({ data }: { data: Record<string, unknown> }) {
       </button>
 
       {showDetails && (
-        <div className="space-y-4 rounded-lg border border-border p-4">
-          <div className="space-y-2">
+        <div className="space-y-6 rounded-lg border border-border p-4">
+          <div className="space-y-3 pb-4 border-b border-border">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               AI Pipeline
             </p>
-            <ul className="space-y-1 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-muted-foreground break-words">
               <li>✓ Freshness Agent — {freshnessBadge}</li>
               <li>
                 ✓ Trend Agent —{" "}
@@ -261,16 +261,16 @@ function MessageState({
 
   return (
     <div className="space-y-4 py-8 text-center">
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <span
-          className="inline-block h-2.5 w-2.5 rounded-full bg-muted-foreground"
+          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-muted-foreground"
           aria-hidden="true"
         />
-        <span className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium leading-none text-foreground">
           {freshnessStatus}
         </span>
-        <span className="text-sm text-muted-foreground">·</span>
-        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
+        <span className="text-sm leading-none text-muted-foreground">·</span>
+        <span className="text-sm leading-none text-muted-foreground">{freshnessBadge}</span>
       </div>
       <p className="text-sm text-muted-foreground">{message}</p>
     </div>
