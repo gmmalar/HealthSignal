@@ -148,8 +148,8 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 | Layer | Technology |
 |---|---|
 | Frontend | Lovable, React, TypeScript, TanStack Start |
-| AI | Claude Sonnet |
-| Data Sources | EPA AirNow, Delphi Epidata, CDC NNDSS |
+| AI | Claude API (Sonnet) |
+| Data Sources | EPA AirNow API, Delphi Epidata API, CDC NNDSS (Socrata Open Data API) |
 | AI Architecture | Health Intelligence Manager, deterministic AI agents, Claude Sonnet |
 | Version Control | GitHub |
 
@@ -169,9 +169,7 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 
 **Weekly Data Release Cadence**
 
-Weekly surveillance data follows the publication cadence of the underlying public health sources. Flu surveillance is retrieved from the latest available Delphi weekly release, and Disease Outbreak surveillance is currently aligned with the latest validated CDC NNDSS publication (Week 26, 2026 at the time of submission). This reporting week was manually confirmed and updated during the build after CDC published new data mid-week — demonstrating the same freshness discipline the Freshness Agent applies to Flu and Air Quality. A future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week manually.
-
-The current MVP references the latest validated reporting week explicitly. A future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week.
+Weekly surveillance data follows the publication cadence of the underlying public health sources. Flu surveillance is retrieved from the latest available Delphi weekly release, and Disease Outbreak surveillance is currently aligned with the latest validated CDC NNDSS publication (Week 26, 2026 at the time of submission). This reporting week was manually confirmed and updated during the build after CDC published new data mid-week — demonstrating the same freshness discipline the Freshness Agent applies to Flu and Air Quality. The current MVP references the latest validated reporting week explicitly; a future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week manually.
 
 **Trend Detection Coverage**
 
