@@ -5,6 +5,7 @@
 
 HealthSignal transforms live government surveillance data into trustworthy, plain-language public health briefings using deterministic AI reasoning and LLM-powered communication.
 
+**Live demo:** [healthsignal-app.lovable.app](https://healthsignal-app.lovable.app)
 ---
 
 ## Problem
