@@ -20,8 +20,6 @@ HealthSignal answers three simple questions for every briefing: **What is happen
 
 **Target users:** parents, caregivers, older adults, travelers, and anyone seeking trusted public health information when making everyday decisions.
 
-
-![Disease outbreak briefing example](docs/screenshots/HealthSignal_Florida_Disease_Outbreaks.jpg)
 ---
 
 ## Explainable AI by Design
@@ -31,8 +29,6 @@ HealthSignal combines deterministic AI reasoning with LLM-powered communication 
 HealthSignal separates deterministic reasoning from language generation. A Health Intelligence Manager orchestrates three deterministic specialist agents — Freshness, Trend, and Alert — before invoking Claude to generate a plain-language briefing.
 
 **Claude is used exactly once in the pipeline — only to explain, never to decide.**
-
-![Flu briefing with AI reasoning detail](docs/screenshots/HealthSignal_Texas_Flu_Freshness_Trend_HealthTopic_Agent.jpg)
 
 **Typical AI application**
 ```
