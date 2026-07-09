@@ -166,6 +166,49 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 | Alert Agent | Determine attention level |
 | Claude Sonnet | Generate plain-language explanations |
 
+## How to Run
+
+### Live Demo
+
+The easiest way to experience HealthSignal is through the live application:
+
+**https://healthsignal-app.lovable.app**
+
+---
+
+### Run Locally (Frontend Only)
+
+#### Prerequisites
+
+- Node.js 18+
+- npm
+
+#### Setup
+
+```bash
+git clone https://github.com/gmmalar/HealthSignal.git
+cd HealthSignal
+npm install
+npm run dev
+```
+
+Open the local URL shown in your terminal (typically `http://localhost:5173`).
+
+#### Important: API keys and backend
+
+HealthSignal's AI agents and live data adapters (EPA AirNow, Delphi Epidata, CDC NNDSS, Claude) run as **server-side functions in Lovable Cloud**, not as client-side environment variables. These secrets (`AIRNOW_API_KEY`, `ANTHROPIC_API_KEY`) are configured in the Lovable Cloud project and are not included in this repository for security reasons.
+
+As a result:
+- Running `npm run dev` locally will start the frontend UI, but briefing generation will not work without access to the same Lovable Cloud backend.
+- To fully run HealthSignal end-to-end, use the live demo link above, or fork the project into your own Lovable workspace and configure your own API keys under **Cloud → Secrets**.
+
+---
+
+### Notes
+
+- HealthSignal retrieves live public health data from EPA AirNow, Delphi Epidata, and CDC NNDSS.
+- Coverage depends on the availability and reporting cadence of each public health source.
+
 ## Known Limitations
 
 **Weekly Data Release Cadence**
