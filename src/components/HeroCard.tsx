@@ -140,6 +140,20 @@ function DataState({ data }: { data: Record<string, unknown> }) {
         ? data.lastUpdated
         : "—");
 
+  const trendInfo =
+    (data.trendInfo as
+      | {
+          supported: boolean;
+          direction?: string;
+          strength?: string;
+          consecutivePeriods?: number;
+        }
+      | undefined) ?? undefined;
+  const alertInfo =
+    (data.alertInfo as
+      | { level: string; reason: string }
+      | undefined) ?? undefined;
+
   const dotClass =
     freshnessStatus === "Verified"
       ? "bg-emerald-500"
@@ -180,7 +194,7 @@ function DataState({ data }: { data: Record<string, unknown> }) {
         className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-expanded={showDetails}
       >
-        Show Technical Details
+        Technical Details & AI Reasoning
         {showDetails ? (
           <ChevronUp className="h-4 w-4" />
         ) : (
@@ -190,6 +204,24 @@ function DataState({ data }: { data: Record<string, unknown> }) {
 
       {showDetails && (
         <div className="space-y-4 rounded-lg border border-border p-4">
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              AI Pipeline
+            </p>
+            <ul className="space-y-1 text-sm text-muted-foreground">
+              <li>✓ Freshness Agent — {freshnessBadge}</li>
+              <li>
+                ✓ Trend Agent —{" "}
+                {trendInfo?.supported
+                  ? `${trendInfo.direction}, ${trendInfo.strength} strength, ${trendInfo.consecutivePeriods} consecutive periods`
+                  : "Not available for this topic"}
+              </li>
+              <li>
+                ✓ Alert Agent — {alertInfo?.level ?? "—"} · {alertInfo?.reason ?? "—"}
+              </li>
+              <li>✓ Health Topic Agent (Claude) — Summary generated</li>
+            </ul>
+          </div>
           <JsonBlock title="Raw JSON" value={data.rawData ?? null} />
           <JsonBlock title="Normalized Data" value={data.normalizedData ?? null} />
           <JsonBlock title="API Response" value={data} />
