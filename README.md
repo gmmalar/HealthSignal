@@ -188,8 +188,8 @@ The easiest way to experience HealthSignal is through the live application:
 ```bash
 git clone https://github.com/gmmalar/HealthSignal.git
 cd HealthSignal
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open the local URL shown in your terminal (typically `http://localhost:5173`).
