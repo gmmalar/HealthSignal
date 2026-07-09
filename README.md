@@ -23,6 +23,8 @@ HealthSignal answers three simple questions for every briefing: **What is happen
 
 ## Explainable AI by Design
 
+HealthSignal combines deterministic AI reasoning with LLM-powered communication to produce transparent, explainable public health briefings from trusted government data.
+
 HealthSignal separates deterministic reasoning from language generation. A Health Intelligence Manager orchestrates three deterministic specialist agents — Freshness, Trend, and Alert — before invoking Claude to generate a plain-language briefing.
 
 **Claude is used exactly once in the pipeline — only to explain, never to decide.**
@@ -64,6 +66,7 @@ The Health Intelligence Manager coordinates each agent in sequence, passing veri
 - **Deterministic reasoning before LLM generation** — factual analysis is rule-based and auditable.
 - **Explainable AI** — every reasoning step can be inspected independently.
 - **Graceful handling of missing data** — HealthSignal never invents unavailable public health information.
+- **Source-agnostic reasoning** — data from EPA AirNow, CDC NNDSS, and Delphi Epidata is transformed into a common HealthSignal schema before AI processing begins. Every downstream agent operates on this shared schema rather than learning each source API individually, making the architecture reusable as additional public health datasets are added.
 
 ---
 
@@ -95,7 +98,7 @@ This orchestration ensures that reasoning is transparent, repeatable, and explai
 
 ![Future Platform Vision](https://raw.githubusercontent.com/gmmalar/HealthSignal/main/docs/architecture/future_platform.png)
 
-A conceptual view of where HealthSignal is headed — clearly separated from what's built today. Full roadmap details are further below.
+A conceptual view of where HealthSignal is headed — clearly separated from what's built today. This future layer is **workflow automation** (detecting new data releases, refreshing adapters, persisting history), which is a distinct concern from the **AI reasoning orchestration** shown above. The Health Intelligence Manager orchestrates deterministic reasoning today; n8n would orchestrate operational automation tomorrow. Full roadmap details are further below.
 
 ---
 
@@ -147,8 +150,20 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 | Frontend | Lovable, React, TypeScript, TanStack Start |
 | AI | Claude Sonnet |
 | Data Sources | EPA AirNow, Delphi Epidata, CDC NNDSS |
-| Architecture | Multi-agent orchestration, deterministic rule engines |
+| AI Architecture | Health Intelligence Manager, deterministic AI agents, Claude Sonnet |
 | Version Control | GitHub |
+
+## Architecture Summary
+
+| Component | Responsibility |
+|---|---|
+| Data Adapters | Retrieve live government surveillance data |
+| Normalization Layer | Convert source-specific APIs into a common HealthSignal schema |
+| Health Intelligence Manager | Coordinate the AI workflow |
+| Freshness Agent | Verify publication freshness |
+| Trend Agent | Detect changes over time |
+| Alert Agent | Determine attention level |
+| Claude Sonnet | Generate plain-language explanations |
 
 ## Known Limitations
 
@@ -161,6 +176,10 @@ The current MVP references the latest validated reporting week explicitly. A fut
 **Trend Detection Coverage**
 
 The Trend Agent is fully generic and topic-agnostic, but currently only the Flu adapter retrieves multi-period historical data. Air Quality and Disease Outbreaks return single-period snapshots today, so trend analysis is not yet available for those topics — the architecture requires no changes to support them once their adapters are extended to retrieve historical data.
+
+**Additional Topics Considered**
+
+Heat Risk and RSV were evaluated during development. Heat Risk was not pursued because the CDC's HeatRisk data is served as a GIS raster feed rather than a structured JSON API, and the official dashboard was unavailable during the build window. RSV surveillance data available through public sources at the time was not sufficiently current to meet HealthSignal's freshness standards. Both remain candidates for future integration if reliable, structured live data sources become available.
 
 ---
 
