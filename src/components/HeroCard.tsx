@@ -164,17 +164,17 @@ function DataState({ data }: { data: Record<string, unknown> }) {
           : "bg-muted-foreground";
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`inline-block h-2.5 w-2.5 rounded-full ${dotClass}`}
+          className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`}
           aria-hidden="true"
         />
-        <span className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium leading-none text-foreground">
           {freshnessStatus}
         </span>
-        <span className="text-sm text-muted-foreground">·</span>
-        <span className="text-sm text-muted-foreground">{freshnessBadge}</span>
+        <span className="text-sm leading-none text-muted-foreground">·</span>
+        <span className="text-sm leading-none text-muted-foreground">{freshnessBadge}</span>
       </div>
 
       {summary && (
