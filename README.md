@@ -120,7 +120,7 @@ Every supported state/topic combination was validated against live government da
 | **Freshness Agent** | **Deterministic** | Validates publication cadence and freshness |
 | **Trend Agent** | **Deterministic** | Detects direction and strength of change |
 | **Alert Agent** | **Deterministic** | Evaluates attention level using rules |
-| Health Topic Agent | Claude API (Sonnet) (LLM) | Produces plain-language summaries |
+| Health Topic Agent | LLM (Claude API - Sonnet)| Produces plain-language summaries |
 
 Three of four agents are fully deterministic. Claude is used exactly once in the pipeline — only to explain, never to decide.
 
@@ -252,7 +252,7 @@ Current MVP scope: 3 live health topics, up to 13 validated U.S. states, 4 produ
 ## Credits
 
 - Deterministic health reasoning designed and implemented by HealthSignal.
-- Plain-language summaries generated using Claude Sonnet.
+- Plain-language summaries generated using Claude API (Sonnet).
 - Public health data provided by:
   - U.S. CDC
   - EPA AirNow
