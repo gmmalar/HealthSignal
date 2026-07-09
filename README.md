@@ -1,4 +1,4 @@
-![HealthSignal — Air Quality briefing](docs/screenshots/HealthSignal_Florida_AirQuality_Freshness_Agent.jpg)
+![HealthSignal](docs/screenshots/HealthSignal_NorthCarolina_AirQuality_Hero.jpg)
 
 # HealthSignal
 
