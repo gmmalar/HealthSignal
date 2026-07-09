@@ -164,7 +164,7 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 | Freshness Agent | Verify publication freshness |
 | Trend Agent | Detect changes over time |
 | Alert Agent | Determine attention level |
-| Claude Sonnet | Generate plain-language explanations |
+| Claude API (Sonnet) | Generate plain-language explanations |
 
 ## How to Run
 
