@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, ClipboardList, Loader2, XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  ClipboardList,
+  Loader2,
+  ShieldCheck,
+  TrendingUp,
+  TriangleAlert,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 export type BriefingStatus =
   | "empty"
