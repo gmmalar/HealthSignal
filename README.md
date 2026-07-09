@@ -119,7 +119,7 @@ Every supported state/topic combination was validated against live government da
 | **Freshness Agent** | **Deterministic** | Validates publication cadence and freshness |
 | **Trend Agent** | **Deterministic** | Detects direction and strength of change |
 | **Alert Agent** | **Deterministic** | Evaluates attention level using rules |
-| Health Topic Agent | Claude Sonnet (LLM) | Produces plain-language summaries |
+| Health Topic Agent | Claude API (Sonnet) (LLM) | Produces plain-language summaries |
 
 Three of four agents are fully deterministic. Claude is used exactly once in the pipeline — only to explain, never to decide.
 
