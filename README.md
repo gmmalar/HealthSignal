@@ -250,6 +250,12 @@ The items above are explicitly planned work and are not part of the current MVP.
 
 Current MVP scope: 3 live health topics, up to 13 validated U.S. states, 4 production-ready AI agents.
 
+## Screenshots
+
+| Disease Outbreaks (Florida) | Flu — AI Reasoning (Texas) |
+|---|---|
+| ![Disease outbreak briefing](docs/screenshots/HealthSignal_Florida_Disease_Outbreaks_Framed.jpg) | ![Flu briefing with AI reasoning](docs/screenshots/HealthSignal_Texas_Flu_Reasoning_Framed.jpg) |
+
 ## Credits
 
 - Deterministic health reasoning designed and implemented by HealthSignal.
