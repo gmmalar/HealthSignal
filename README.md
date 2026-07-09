@@ -252,6 +252,8 @@ Current MVP scope: 3 live health topics, up to 13 validated U.S. states, 4 produ
 
 ## Screenshots
 
+## Screenshots
+
 | Disease Outbreaks (Florida) | Flu — AI Reasoning (Texas) |
 |---|---|
 | ![Disease outbreak briefing](docs/screenshots/HealthSignal_Florida_Disease_Outbreaks.jpg) | ![Flu briefing with AI reasoning](docs/screenshots/HealthSignal_Texas_Flu_Freshness_Trend_HealthTopic_Agent.jpg) |
