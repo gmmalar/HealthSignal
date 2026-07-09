@@ -151,7 +151,7 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 | Frontend | Lovable, React, TypeScript, TanStack Start |
 | AI | Claude API (Sonnet) |
 | Data Sources | EPA AirNow API, Delphi Epidata API, CDC NNDSS (Socrata Open Data API) |
-| AI Architecture | Health Intelligence Manager, deterministic AI agents, Claude Sonnet |
+| AI Architecture | Health Intelligence Manager, deterministic AI agents, Claude API (Sonnet) |
 | Version Control | GitHub |
 
 ## Architecture Summary
