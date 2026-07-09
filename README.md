@@ -169,7 +169,7 @@ Three of four agents are fully deterministic. Claude is used exactly once in the
 
 **Weekly Data Release Cadence**
 
-Weekly surveillance data follows the publication cadence of the underlying public health sources. Flu surveillance is retrieved from the latest available Delphi weekly release, and Disease Outbreak surveillance is currently aligned with the latest validated CDC NNDSS publication (Week 25, 2026 at the time of submission). During validation, Week 26 was confirmed as not yet published by either source, so the displayed data represents the most current verified release available.
+Weekly surveillance data follows the publication cadence of the underlying public health sources. Flu surveillance is retrieved from the latest available Delphi weekly release, and Disease Outbreak surveillance is currently aligned with the latest validated CDC NNDSS publication (Week 26, 2026 at the time of submission). This reporting week was manually confirmed and updated during the build after CDC published new data mid-week — demonstrating the same freshness discipline the Freshness Agent applies to Flu and Air Quality. A future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week manually.
 
 The current MVP references the latest validated reporting week explicitly. A future enhancement will automatically detect and consume newly published weekly releases as they become available, eliminating the need to reference a specific reporting week.
 
