@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { HealthSignalResponse, JsonValue } from "./types";
 
-const CURRENT_NNDSS = { year: "2026", week: "25" };
+const CURRENT_NNDSS = { year: "2026", week: "26" };
 
 const STATE_JURISDICTION: Record<string, string> = {
   texas: "Texas",
