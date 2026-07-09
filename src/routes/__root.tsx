@@ -85,6 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "HealthSignal — Public Health Intelligence" },
+      { name: "twitter:description", content: "Simple, trustworthy public health briefings using verified public health data." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/6ICYDP9s9WSye1ZEHdmo9ix0OjW2/social-images/social-1783631813180-Social_Lovable_design.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/6ICYDP9s9WSye1ZEHdmo9ix0OjW2/social-images/social-1783631813180-Social_Lovable_design.webp" },
     ],
     links: [
       {
