@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -130,8 +130,19 @@ function LoadingState() {
   );
 }
 
+function useDebugMode(): boolean {
+  const [debug, setDebug] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setDebug(params.get("debug") === "true" || params.get("debug") === "1");
+  }, []);
+  return debug;
+}
+
 function DataState({ data }: { data: Record<string, unknown> }) {
   const [showDetails, setShowDetails] = useState(false);
+  const isDebug = useDebugMode();
 
   const summary = typeof data.summary === "string" ? data.summary : null;
   const generatedBy = typeof data.generatedBy === "string" ? data.generatedBy : null;
@@ -245,8 +256,12 @@ function DataState({ data }: { data: Record<string, unknown> }) {
               </li>
             </ul>
           </div>
-          <JsonBlock title="Normalized Data" value={data.normalizedData ?? null} />
-          <JsonBlock title="API Response" value={data} />
+          {isDebug && (
+            <>
+              <JsonBlock title="Normalized Data" value={data.normalizedData ?? null} />
+              <JsonBlock title="API Response" value={data} />
+            </>
+          )}
         </div>
       )}
     </div>
