@@ -130,8 +130,19 @@ function LoadingState() {
   );
 }
 
+function useDebugMode(): boolean {
+  const [debug, setDebug] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setDebug(params.get("debug") === "true" || params.get("debug") === "1");
+  }, []);
+  return debug;
+}
+
 function DataState({ data }: { data: Record<string, unknown> }) {
   const [showDetails, setShowDetails] = useState(false);
+  const isDebug = useDebugMode();
 
   const summary = typeof data.summary === "string" ? data.summary : null;
   const generatedBy = typeof data.generatedBy === "string" ? data.generatedBy : null;
