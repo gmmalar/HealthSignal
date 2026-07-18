@@ -245,7 +245,6 @@ function DataState({ data }: { data: Record<string, unknown> }) {
               </li>
             </ul>
           </div>
-          <JsonBlock title="Raw JSON" value={data.rawData ?? null} />
           <JsonBlock title="Normalized Data" value={data.normalizedData ?? null} />
           <JsonBlock title="API Response" value={data} />
         </div>
